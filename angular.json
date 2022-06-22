@@ -34,6 +34,7 @@
               "src/styles.css"
             ],
             "scripts": ["src/assets/sigma.conf.js",
+              
               "node_modules/sigma/build/sigma.min.js",
               "node_modules/sigma/build/sigma.js"]
           },

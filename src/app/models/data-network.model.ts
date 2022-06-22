@@ -1,4 +1,4 @@
-export class DataNetwork{
+export class topo{
     constructor(     
         public nodes:nodes[],
         public links:links[]
@@ -7,14 +7,18 @@ export class DataNetwork{
 
 export class nodes{
     constructor(     
-        public id:string,
-        public name:string
+        public source:string,
+        public target_port_disp:string,
+        public source_port_disp:string,
+        public target:string,
      ) {}
 }
 
 export class links{
     constructor(     
-        public source:number,
-        public target:number
+        public source:string,
+        public target_port_disp:string,
+        public source_port_disp:string,
+        public target:string,
      ) {}
 }

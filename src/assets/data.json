@@ -15,7 +15,8 @@
             {"source": "s2", "target_port_disp": "port_22", "source_port_disp": "port_1", "target": "s3"},
             {"source": "s1", "target_port_disp": "port_7", "source_port_disp": "port_9", "target": "s2"},
             {"source": "s1", "target_port_disp": "port_1", "source_port_disp": "port_2", "target": "s4"},
-            {"source": "s3", "target_port_disp": "port_5", "source_port_disp": "port_6", "target": "s4"}
+            {"source": "s3", "target_port_disp": "port_5", "source_port_disp": "port_6", "target": "s4"},
+            {"source": "s0", "target_port_disp": "port_1", "source_port_disp": "port_7", "target": "s4"}
         ]
     }
 }
