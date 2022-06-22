@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef  } from '@angular/core';
-import * as d3 from 'd3';
+var d3 = require("d3");
 
 @Component({
   selector: 'app-d3-network',
@@ -41,7 +41,7 @@ export class D3NetworkComponent implements OnInit {
     { id: 2, reflexive: false }
   ];
   links = [
-    { source: this.nodes[0], target: this.nodes[1], left: false, right: true },
+    { source: this.nodes[0], target: this.nodes[1], left: true, right: true },
     { source: this.nodes[1], target: this.nodes[2], left: false, right: true }
   ];
 
@@ -55,7 +55,7 @@ export class D3NetworkComponent implements OnInit {
       .attr('oncontextmenu', 'return false;')
       .attr('width', this.width)
       .attr('height', this.height);
-
+    
     this.force = d3.forceSimulation()
       .force('link', d3.forceLink().id((d: any) => d.id).distance(150))
       .force('charge', d3.forceManyBody().strength(-500))
@@ -71,11 +71,11 @@ export class D3NetworkComponent implements OnInit {
         d.fx = d.x;
         d.fy = d.y;
       })
-      .on('drag', (event, d: any) => {
+      .on('drag', (event: any, d: any) => {
         d.fx = event.x;
         d.fy = event.y;
       })
-      .on('end', (event,d: any) => {
+      .on('end', (event: any,d: any) => {
         if (!event.active) this.force.alphaTarget(0.3);
 
         d.fx = null;
@@ -106,7 +106,6 @@ export class D3NetworkComponent implements OnInit {
       .attr('d', 'M10,-5L0,0L10,5')
       .attr('fill', '#000');
 
-
     // line displayed when dragging new nodes
     this.dragLine = this.svg.append('svg:path')
       .attr('class', 'link dragline hidden')
@@ -114,7 +113,14 @@ export class D3NetworkComponent implements OnInit {
 
     // handles to link and node element groups
     this.path = this.svg.append('svg:g').selectAll('path');
-    this.circle = this.svg.append('svg:g').selectAll('g');
+    this.circle = this.svg.append('svg:g').selectAll('g')
+    .enter()
+    .append("image")
+    .attr("xlink:href", "https://github.com/favicon.ico")
+    .attr("x", 8)
+    .attr("y", 8)
+    .attr("width", 160)
+    .attr("height", 160);;
 
     // app starts here
     this.svg.on('mousedown', (event: any, dataItem: any, value: any, source: any) => this.mousedown(event, dataItem, value, source))
