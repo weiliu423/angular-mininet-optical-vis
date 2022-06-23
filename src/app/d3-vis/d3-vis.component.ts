@@ -9,10 +9,10 @@ import {
   } from "@angular/core";
   var d3 = require("d3");
   var D3Tip = require("../../assets/d3-tip.js");
-  import { links, topo } from "../models/data-network.model";
+  import { links, network, nodes, topo } from "../models/data-network.model";
   import { HttpClient } from "@angular/common/http";
   import { Observable } from "rxjs";
-  
+
   @Component({
     selector: "app-d3-vis",
     templateUrl: "./d3-vis.component.html",
@@ -22,25 +22,30 @@ import {
     public isRendered = false;
     private _jsonURL =
       "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json";
+    public network!: network;
     public networkData!: topo;
     public linksArray: links[] = [];
+    public nodeArray: nodes[] = [];
     public selData: any;
+    public preLinkProcess: boolean = false;
+    public preNodeProcess: boolean = false;
 
     constructor(private http: HttpClient) {
     //   this.getJSON().subscribe((data) => {
     //     console.log(data);
     //     this.networkData = data;
     //   });
+      
     }
   
     @ViewChild("topo_container", { read: ElementRef, static: true })
     svgContainerRef!: ElementRef<HTMLDivElement>;
   
     ngOnInit(): void {
-      this.initialize_topo();
-      this.load();
-      this.nodefileParse();
-      this.linkfileParse();
+
+      this.networkData = new topo([], []);
+      
+      this.linkfileParse();      
     }
   
     ngAfterContentInit() {
@@ -175,63 +180,23 @@ import {
         /*
                 tooltip
             */
-        //   var Tooltip = d3.select("#div_template")
-        //   .append("div")
-        //   .style("opacity", 0)
-        //   .attr("class", "tooltip")
-        //   .style("background-color", "white")
-        //   .style("border", "solid")
-        //   .style("border-width", "2px")
-        //   .style("border-radius", "5px")
-        //   .style("padding", "5px")
-  
-        // // Three function that change the tooltip when user hover / move / leave a cell
-        // var mouseover = (d : any, i:any, n:any) => {
-        //   Tooltip
-        //     .style("opacity", 1)
-        //   d3.select(n[i])
-        //     .style("stroke", "black")
-        //     .style("opacity", 1)
-        // }
-        // var mousemove = (d : any, i:any, n:any) => {
-        //   Tooltip
-        //     .html("The exact value of<br>this cell is: " + d.value)
-        //     .style("left", (d3.mouse(n[i])[0]+70) + "px")
-        //     .style("top", (d3.mouse(n[i])[1]) + "px")
-        // }
-        // var mouseleave = (d : any, i:any, n:any) => {
-        //   Tooltip
-        //     .style("opacity", 0)
-        //   d3.select(n[i])
-        //     .style("stroke", "none")
-        //     .style("opacity", 0.8)
-        // }
-        console.log(D3Tip());
         let node_tip = D3Tip()
           .attr("class", "tooltip")
           .offset([-10, 0])
           .html((d: any) => {
             console.log(this.selData);
             d = this.selData;
-            return (
-              "<p><strong class='title'>MAC:</strong> " +
-              d.mac +
-              "</p>" +
+            return (   
+              "<p><strong class='title'>Name:</strong>" +
+              d.device_name +
+              "</p>" +      
               "<p><strong class='title'>IP:</strong>" +
               d.ip +
               "</p>" +
-              "<p><strong class='title'>Netmask:</strong>" +
-              d.netmask +
-              "</p>" +
-              "<p><strong class='title'>Gateway:</strong>" +
-              d.gateway +
-              "</p>" +
-              "<p><strong class='title'>VLAN:</strong>" +
-              d.vlan +
-              "</p>" +
-              "<p><strong class='title'>Name:</strong>" +
-              d.device_name +
+              "<p><strong class='title'>Pid:</strong>" +
+              d.pid +
               "</p>"
+             
             );
           });
         this.svg.call(node_tip);
@@ -277,6 +242,8 @@ import {
         svg = d3.select(this.svgContainerRef.nativeElement);
   
       d3.json("../../assets/data.json", (graph: any) => {
+      // console.log(JSON.stringify(this.network));
+      // d3.json(JSON.stringify(this.network), (graph: any) => {
         console.log("ssssssssss", graph);
         graph = graph["topo"];
         // let links = [];
@@ -785,41 +752,159 @@ import {
         .then(data => {
             for(let line of data.split(/[\r\n]+/))
             {
-                console.log(line);
                 let nodeData :any = line.match(/\<(.*?)\>/);
                 if(nodeData != null)
                 {
-                    let node = nodeData[1].split(',');
-                    console.log(node);
-                }
-                
-               
-            //     if(status.length > 0)
-            //     {
-            //         console.log(status[0]);
-            //     }
-            //     line.split('<->').forEach((element, i) => {
-            //         element = element.replace(status[0], '');
-            //         console.log(element, i);
-            //         this.sourceName = element.split('-')[0];
-            //         this.sourcePort = element.split('-')[1];
-            //         if(i == 0)
-            //         {
-            //             this.target = line.split('<->')[i+1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
-            //             this.targetPort = line.split('<->')[i+1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
-            //         }else{
-            //             this.target = line.split('<->')[i-1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
-            //             this.targetPort = line.split('<->')[i-1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
-            //         }
-            //         this.addLink(this.sourceName, this.sourcePort, this.target, this.targetPort);
-            //     });
-            //     break
-            // }
-            // this.networkData = {
-            //     nodes: [],
-            //     links: this.linksArray
+                    if(nodeData[1].includes('Host'))
+                    {
+                       this.hostParse(nodeData[1]);
+                    }
+                    else if(nodeData[1].includes('ROADM'))
+                    {
+                        this.roadmParse(nodeData[1]);
+                    }
+                    else if(nodeData[1].includes('OVSBridge'))
+                    {
+                        this.ovsbridgeParse(nodeData[1]);
+                    }
+                    else if(nodeData[1].includes('Terminal'))
+                    {
+                        this.terminalParse(nodeData[1]);
+
+                    }
+                    else{
+                      this.additionalParse('');
+                    }               
+                }           
             };
-        });  
+            this.networkData.nodes = this.nodeArray;
+            this.preNodeProcess = true;
+            this.network = new network(this.networkData);   
+            console.log(JSON.stringify(this.network))
+
+            this.initialize_topo();
+            this.load();
+        });
+        
+    }
+
+    public regexExp = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi;
+    hostParse(host: string)
+    {
+      //parse host parameter and split by ':'
+      let hostData = host.split(':');
+      //if hostData is not empty, then add node to networkData
+      if(hostData.length > 0)
+      {
+        let source = hostData[0].replace('Host', '').replace(/\s/g, "");
+        let ip = '';
+        let pid = '';
+        hostData[2].split(' ').forEach((element) => {
+          if(this.regexExp.test(element))
+          {
+            ip = element;
+          }
+          else if(element.includes('pid'))
+          {
+            pid = element.split('=')[1];
+          }
+        });
+        this.addNode(source, ip, pid);
+      }
+    }
+
+    roadmParse(roadm: string)
+    {
+      //parse roadm parameter and split by ':'
+      let roadmData = roadm.split(',');
+      //if roadmData is not empty, then add node to networkData
+      if(roadmData.length > 0)
+      {
+        let source = '';
+        let ip = '';
+        let pid = '';
+        source = roadmData[0].split(':')[0].replace('ROADM', '').replace(/\s/g, "");
+        roadmData.forEach((element) => {
+          if(this.regexExp.test(element.split('lo:')[1]))
+          {
+            ip = element.split('lo:')[1];
+          }
+          else if(element.includes('pid'))
+          {
+            pid = element.split('=')[1];
+          }
+        });
+        this.addNode(source, ip, pid);
+      }
+    }
+
+    ovsbridgeParse(ovsbridge: string)
+    {
+      //parse ovsbridge parameter and split by ':'
+      let ovsbridgeData = ovsbridge.split(',');
+      //if ovsbridgeData is not empty, then add node to networkData
+      if(ovsbridgeData.length > 0)
+      {
+        let source = '';
+        let ip = '';
+        let pid = '';
+        source = ovsbridgeData[0].split(':')[0].replace('OVSBridge ', '').replace(/\s/g, "");
+        ovsbridgeData.forEach((element) => {
+          if(this.regexExp.test(element.split('lo:')[1]))
+          {
+            ip = element.split('lo:')[1];
+          }
+          else if(element.includes('pid'))
+          {
+            pid = element.split('=')[1];
+          }
+        });
+        this.addNode(source, ip, pid);
+      }
+    }
+
+    terminalParse(terminal: string)
+    {
+      //parse terminal parameter and split by ':'
+      let terminalData = terminal.split(',');
+      //if terminalData is not empty, then add node to networkData
+      if(terminalData.length > 0)
+      {
+        let source = '';
+        let ip = '';
+        let pid = '';
+        source = terminalData[0].split(':')[0].replace('Terminal ', '').replace(/\s/g, "");
+        terminalData.forEach((element) => {
+          if(this.regexExp.test(element.split('lo:')[1]))
+          {
+            ip = element.split('lo:')[1];
+          }
+          else if(element.includes('pid'))
+          {
+            pid = element.split('=')[1];
+          }
+        });
+        this.addNode(source, ip, pid);
+      }
+    }
+
+    additionalParse(data: any)
+    {
+
+    }
+
+    addNode(source: string, ip : string, pid : string)
+    {
+        let node = {
+            id: source,
+            device_name : source,
+            netmask: '255.255.255.0',
+            ip: ip,
+            pid: pid,
+        };
+        //example of how to add a link to the graph
+        //{"source": "s0", "target_port_disp": "port_1", "source_port_disp": "port_7", "target": "s4"}
+        this.nodeArray.push(node);
     }
 
     linkfileParse()
@@ -830,30 +915,30 @@ import {
             for(let line of data.split(/[\r\n]+/))
             {
                 let status :any = line.match(/\((.*?)\)/);
-
-                if(status.length > 0)
-                {                                 
-                    line.split('<->').forEach((element, i) => {
-                        element = element.replace(status[0], '');
-                        this.sourceName = element.split('-')[0];
-                        this.sourcePort = element.split('-')[1];
-                        if(i == 0)
-                        {
-                            this.target = line.split('<->')[i+1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
-                            this.targetPort = line.split('<->')[i+1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
-                        }else{
-                            this.target = line.split('<->')[i-1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
-                            this.targetPort = line.split('<->')[i-1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
-                        }
-                        this.addLink(this.sourceName, this.sourcePort, this.target, this.targetPort);
-                    });
+                if(status != null)
+                {
+                  if(status.length > 0)
+                  {                                 
+                      line.split('<->').forEach((element, i) => {
+                          element = element.replace(status[0], '');
+                          this.sourceName = element.split('-')[0];
+                          this.sourcePort = element.split('-')[1];
+                          if(i == 0)
+                          {
+                              this.target = line.split('<->')[i+1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
+                              this.targetPort = line.split('<->')[i+1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
+                          }else{
+                              this.target = line.split('<->')[i-1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
+                              this.targetPort = line.split('<->')[i-1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
+                          }
+                          this.addLink(this.sourceName, this.sourcePort, this.target, this.targetPort);
+                      });
+                  }
                 }
-                break
             }
-            this.networkData = {
-                nodes: [],
-                links: this.linksArray
-            };
+            this.networkData.links = this.linksArray;
+            this.preLinkProcess = true;
+            this.nodefileParse();         
         });  
     }
 
@@ -865,70 +950,11 @@ import {
             target_port_disp: targetPortName,
             source_port_disp: sourcePortName
 
-        };
+        }
         //example of how to add a link to the graph
         //{"source": "s0", "target_port_disp": "port_1", "source_port_disp": "port_7", "target": "s4"}
         this.linksArray.push(link);
     }
-
-    // parseJson(json: any)
-    // {
-    //     //parse json into links and nodes
-    //     let links = json["links"];
-    //     let nodes = json["nodes"];
-    //     let desc = json["desc"];
-    //     this.parseLinks(links);
-    //     this.parseNodes(nodes);
-    //     this.parseDesc(desc);
-    // }
-    // parseLinks(links: any)
-    // {
-    //     //parse links into link objects
-    //     let link_objs = [];
-    //     for(let i = 0; i < links.length; i++)
-    //     {
-    //         let link = links[i];
-    //         let link_obj = {
-    //             source: link["source"],
-    //             target: link["target"],
-    //             intermediate: link["intermediate"]
-    //         }
-    //         link_objs.push(link_obj);
-    //     }
-    //     this.links = link_objs;
-    // }
-    // parseNodes(nodes: any)
-    // {
-    //     //parse nodes into node objects
-    //     let node_objs = [];
-    //     for(let i = 0; i < nodes.length; i++)
-    //     {
-    //         let node = nodes[i];
-    //         let node_obj = {
-    //             name: node["name"],
-    //             x: node["x"],
-    //             y: node["y"]
-    //         }
-    //         node_objs.push(node_obj);
-    //     }
-    //     this.nodes = node_objs;
-    // }
-    // parseDesc(desc: any)
-    // {
-    //     //parse desc into desc objects
-    //     let desc_objs = [];
-    //     for(let i = 0; i < desc.length; i++)
-    //     {
-    //         let desc_obj = {
-    //             name: desc[i]["name"],
-    //             x: desc[i]["x"],
-    //             y: desc[i]["y"]
-    //         }
-
-    //         desc_objs.push(desc_obj);
-    //     }
-    //     this.desc = desc_objs;
-    // }
 
     //#endregion
   

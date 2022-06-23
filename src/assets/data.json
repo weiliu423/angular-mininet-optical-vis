@@ -1,22 +1,1184 @@
 {
     "topo": {
         "nodes": [
-            {"knmp_on": false, "snmp_on": true, "ip": "192.168.2.55", "vlan": 1, "flag": 0, "netmask": "255.255.255.0", "device_name": "device_2", "mac": "00-11-22-33-44-55", "ip_on": false, "id": "s2", "gateway": "0.0.0.0"}, 
-            {"knmp_on": true, "snmp_on": true, "ip": "192.168.2.66", "vlan": 1, "flag": 0, "netmask": "255.255.255.0", "device_name": "device_1", "mac": "11-22-33-44-55-66", "ip_on": true, "id": "s1", "gateway": "0.0.0.0"},
-            {"knmp_on": true, "snmp_on": false, "ip": "192.168.2.77", "vlan": 1, "flag": 0, "netmask": "255.255.255.0", "device_name": "device_3", "mac": "22-33-44-55-66-77", "ip_on": true, "id": "s3", "gateway": "0.0.0.0"},
-            {"knmp_on": false, "snmp_on": false, "ip": "192.168.2.99", "vlan": 1, "flag": 0, "netmask": "255.255.255.0", "device_name": "device_4", "mac": "44-55-66-77-88-99", "ip_on": false, "id": "s4", "gateway": "0.0.0.0"},
-            {"knmp_on": true, "snmp_on": true, "ip": "192.168.2.33", "vlan": 1, "flag": 0, "netmask": "255.255.255.0", "device_name": "device_0", "mac": "55-66-77-88-99-00", "ip_on": true, "id": "s0", "gateway": "0.0.0.0"}],
-
+            {
+                "id": "BBU1",
+                "device_name": "BBU1",
+                "netmask": "255.255.255.0",
+                "ip": "10.0.0.1",
+                "pid": "3755"
+            },
+            {
+                "id": "BBU2",
+                "device_name": "BBU2",
+                "netmask": "255.255.255.0",
+                "ip": "10.0.0.2",
+                "pid": "3757"
+            },
+            {
+                "id": "RRU1",
+                "device_name": "RRU1",
+                "netmask": "255.255.255.0",
+                "ip": "10.0.0.3",
+                "pid": "3759"
+            },
+            {
+                "id": "RRU2",
+                "device_name": "RRU2",
+                "netmask": "255.255.255.0",
+                "ip": "10.0.0.4",
+                "pid": "3761"
+            },
+            {
+                "id": "RRU3",
+                "device_name": "RRU3",
+                "netmask": "255.255.255.0",
+                "ip": "10.0.0.5",
+                "pid": "3763"
+            },
+            {
+                "id": "RRU4",
+                "device_name": "RRU4",
+                "netmask": "255.255.255.0",
+                "ip": "10.0.0.6",
+                "pid": "3765"
+            },
+            {
+                "id": "r1",
+                "device_name": "r1",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3770"
+            },
+            {
+                "id": "r2",
+                "device_name": "r2",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3774"
+            },
+            {
+                "id": "r3",
+                "device_name": "r3",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3778"
+            },
+            {
+                "id": "r4",
+                "device_name": "r4",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3782"
+            },
+            {
+                "id": "r5",
+                "device_name": "r5",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3786"
+            },
+            {
+                "id": "r6",
+                "device_name": "r6",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3790"
+            },
+            {
+                "id": "s1",
+                "device_name": "s1",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3797"
+            },
+            {
+                "id": "s2",
+                "device_name": "s2",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3800"
+            },
+            {
+                "id": "s3",
+                "device_name": "s3",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3803"
+            },
+            {
+                "id": "s4",
+                "device_name": "s4",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3806"
+            },
+            {
+                "id": "s5",
+                "device_name": "s5",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3809"
+            },
+            {
+                "id": "s6",
+                "device_name": "s6",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3812"
+            },
+            {
+                "id": "t1",
+                "device_name": "t1",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3818"
+            },
+            {
+                "id": "t2",
+                "device_name": "t2",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3822"
+            },
+            {
+                "id": "t3",
+                "device_name": "t3",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3826"
+            },
+            {
+                "id": "t4",
+                "device_name": "t4",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3830"
+            },
+            {
+                "id": "t5",
+                "device_name": "t5",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3834"
+            },
+            {
+                "id": "t6",
+                "device_name": "t6",
+                "netmask": "255.255.255.0",
+                "ip": "127.0.0.1",
+                "pid": "3838"
+            }
+        ],
         "links": [
-            {"source": "s1", "target_port_disp": "port_3", "source_port_disp": "port_4", "target": "s4"},
-            {"source": "s3", "target_port_disp": "port_13", "source_port_disp": "port_20", "target": "s4"},
-            {"source": "s2", "target_port_disp": "port_10", "source_port_disp": "port_13", "target": "s3"},
-            {"source": "s1", "target_port_disp": "port_4", "source_port_disp": "port_3", "target": "s2"},
-            {"source": "s2", "target_port_disp": "port_22", "source_port_disp": "port_1", "target": "s3"},
-            {"source": "s1", "target_port_disp": "port_7", "source_port_disp": "port_9", "target": "s2"},
-            {"source": "s1", "target_port_disp": "port_1", "source_port_disp": "port_2", "target": "s4"},
-            {"source": "s3", "target_port_disp": "port_5", "source_port_disp": "port_6", "target": "s4"},
-            {"source": "s0", "target_port_disp": "port_1", "source_port_disp": "port_7", "target": "s4"}
+            {
+                "source": "BBU1",
+                "target": "s1",
+                "target_port_disp": "eth10",
+                "source_port_disp": "eth0"
+            },
+            {
+                "source": "s1",
+                "target": "BBU1",
+                "target_port_disp": "eth0",
+                "source_port_disp": "eth10  "
+            },
+            {
+                "source": "BBU2",
+                "target": "s4",
+                "target_port_disp": "eth10",
+                "source_port_disp": "eth0"
+            },
+            {
+                "source": "s4",
+                "target": "BBU2",
+                "target_port_disp": "eth0",
+                "source_port_disp": "eth10  "
+            },
+            {
+                "source": "RRU1",
+                "target": "s2",
+                "target_port_disp": "eth10",
+                "source_port_disp": "eth0"
+            },
+            {
+                "source": "s2",
+                "target": "RRU1",
+                "target_port_disp": "eth0",
+                "source_port_disp": "eth10  "
+            },
+            {
+                "source": "RRU2",
+                "target": "s3",
+                "target_port_disp": "eth10",
+                "source_port_disp": "eth0"
+            },
+            {
+                "source": "s3",
+                "target": "RRU2",
+                "target_port_disp": "eth0",
+                "source_port_disp": "eth10  "
+            },
+            {
+                "source": "RRU3",
+                "target": "s5",
+                "target_port_disp": "eth10",
+                "source_port_disp": "eth0"
+            },
+            {
+                "source": "s5",
+                "target": "RRU3",
+                "target_port_disp": "eth0",
+                "source_port_disp": "eth10  "
+            },
+            {
+                "source": "RRU4",
+                "target": "s6",
+                "target_port_disp": "eth10",
+                "source_port_disp": "eth0"
+            },
+            {
+                "source": "s6",
+                "target": "RRU4",
+                "target_port_disp": "eth0",
+                "source_port_disp": "eth10  "
+            },
+            {
+                "source": "r1",
+                "target": "r2",
+                "target_port_disp": "wdm111",
+                "source_port_disp": "wdm222"
+            },
+            {
+                "source": "r2",
+                "target": "r1",
+                "target_port_disp": "wdm222",
+                "source_port_disp": "wdm111  "
+            },
+            {
+                "source": "r1",
+                "target": "t1",
+                "target_port_disp": "wdm11",
+                "source_port_disp": "wdm1"
+            },
+            {
+                "source": "t1",
+                "target": "r1",
+                "target_port_disp": "wdm1",
+                "source_port_disp": "wdm11  "
+            },
+            {
+                "source": "r1",
+                "target": "t1",
+                "target_port_disp": "wdm12",
+                "source_port_disp": "wdm2"
+            },
+            {
+                "source": "t1",
+                "target": "r1",
+                "target_port_disp": "wdm2",
+                "source_port_disp": "wdm12  "
+            },
+            {
+                "source": "r1",
+                "target": "t1",
+                "target_port_disp": "wdm13",
+                "source_port_disp": "wdm3"
+            },
+            {
+                "source": "t1",
+                "target": "r1",
+                "target_port_disp": "wdm3",
+                "source_port_disp": "wdm13  "
+            },
+            {
+                "source": "r1",
+                "target": "t1",
+                "target_port_disp": "wdm14",
+                "source_port_disp": "wdm4"
+            },
+            {
+                "source": "t1",
+                "target": "r1",
+                "target_port_disp": "wdm4",
+                "source_port_disp": "wdm14  "
+            },
+            {
+                "source": "r1",
+                "target": "t1",
+                "target_port_disp": "wdm15",
+                "source_port_disp": "wdm5"
+            },
+            {
+                "source": "t1",
+                "target": "r1",
+                "target_port_disp": "wdm5",
+                "source_port_disp": "wdm15  "
+            },
+            {
+                "source": "r1",
+                "target": "t1",
+                "target_port_disp": "wdm16",
+                "source_port_disp": "wdm6"
+            },
+            {
+                "source": "t1",
+                "target": "r1",
+                "target_port_disp": "wdm6",
+                "source_port_disp": "wdm16  "
+            },
+            {
+                "source": "r2",
+                "target": "r3",
+                "target_port_disp": "wdm111",
+                "source_port_disp": "wdm222"
+            },
+            {
+                "source": "r3",
+                "target": "r2",
+                "target_port_disp": "wdm222",
+                "source_port_disp": "wdm111  "
+            },
+            {
+                "source": "r2",
+                "target": "t2",
+                "target_port_disp": "wdm11",
+                "source_port_disp": "wdm1"
+            },
+            {
+                "source": "t2",
+                "target": "r2",
+                "target_port_disp": "wdm1",
+                "source_port_disp": "wdm11  "
+            },
+            {
+                "source": "r2",
+                "target": "t2",
+                "target_port_disp": "wdm12",
+                "source_port_disp": "wdm2"
+            },
+            {
+                "source": "t2",
+                "target": "r2",
+                "target_port_disp": "wdm2",
+                "source_port_disp": "wdm12  "
+            },
+            {
+                "source": "r2",
+                "target": "t2",
+                "target_port_disp": "wdm13",
+                "source_port_disp": "wdm3"
+            },
+            {
+                "source": "t2",
+                "target": "r2",
+                "target_port_disp": "wdm3",
+                "source_port_disp": "wdm13  "
+            },
+            {
+                "source": "r2",
+                "target": "t2",
+                "target_port_disp": "wdm14",
+                "source_port_disp": "wdm4"
+            },
+            {
+                "source": "t2",
+                "target": "r2",
+                "target_port_disp": "wdm4",
+                "source_port_disp": "wdm14  "
+            },
+            {
+                "source": "r2",
+                "target": "t2",
+                "target_port_disp": "wdm15",
+                "source_port_disp": "wdm5"
+            },
+            {
+                "source": "t2",
+                "target": "r2",
+                "target_port_disp": "wdm5",
+                "source_port_disp": "wdm15  "
+            },
+            {
+                "source": "r2",
+                "target": "t2",
+                "target_port_disp": "wdm16",
+                "source_port_disp": "wdm6"
+            },
+            {
+                "source": "t2",
+                "target": "r2",
+                "target_port_disp": "wdm6",
+                "source_port_disp": "wdm16  "
+            },
+            {
+                "source": "r3",
+                "target": "r4",
+                "target_port_disp": "wdm111",
+                "source_port_disp": "wdm222"
+            },
+            {
+                "source": "r4",
+                "target": "r3",
+                "target_port_disp": "wdm222",
+                "source_port_disp": "wdm111  "
+            },
+            {
+                "source": "r3",
+                "target": "t3",
+                "target_port_disp": "wdm11",
+                "source_port_disp": "wdm1"
+            },
+            {
+                "source": "t3",
+                "target": "r3",
+                "target_port_disp": "wdm1",
+                "source_port_disp": "wdm11  "
+            },
+            {
+                "source": "r3",
+                "target": "t3",
+                "target_port_disp": "wdm12",
+                "source_port_disp": "wdm2"
+            },
+            {
+                "source": "t3",
+                "target": "r3",
+                "target_port_disp": "wdm2",
+                "source_port_disp": "wdm12  "
+            },
+            {
+                "source": "r3",
+                "target": "t3",
+                "target_port_disp": "wdm13",
+                "source_port_disp": "wdm3"
+            },
+            {
+                "source": "t3",
+                "target": "r3",
+                "target_port_disp": "wdm3",
+                "source_port_disp": "wdm13  "
+            },
+            {
+                "source": "r3",
+                "target": "t3",
+                "target_port_disp": "wdm14",
+                "source_port_disp": "wdm4"
+            },
+            {
+                "source": "t3",
+                "target": "r3",
+                "target_port_disp": "wdm4",
+                "source_port_disp": "wdm14  "
+            },
+            {
+                "source": "r3",
+                "target": "t3",
+                "target_port_disp": "wdm15",
+                "source_port_disp": "wdm5"
+            },
+            {
+                "source": "t3",
+                "target": "r3",
+                "target_port_disp": "wdm5",
+                "source_port_disp": "wdm15  "
+            },
+            {
+                "source": "r3",
+                "target": "t3",
+                "target_port_disp": "wdm16",
+                "source_port_disp": "wdm6"
+            },
+            {
+                "source": "t3",
+                "target": "r3",
+                "target_port_disp": "wdm6",
+                "source_port_disp": "wdm16  "
+            },
+            {
+                "source": "r4",
+                "target": "r5",
+                "target_port_disp": "wdm111",
+                "source_port_disp": "wdm222"
+            },
+            {
+                "source": "r5",
+                "target": "r4",
+                "target_port_disp": "wdm222",
+                "source_port_disp": "wdm111  "
+            },
+            {
+                "source": "r4",
+                "target": "t4",
+                "target_port_disp": "wdm11",
+                "source_port_disp": "wdm1"
+            },
+            {
+                "source": "t4",
+                "target": "r4",
+                "target_port_disp": "wdm1",
+                "source_port_disp": "wdm11  "
+            },
+            {
+                "source": "r4",
+                "target": "t4",
+                "target_port_disp": "wdm12",
+                "source_port_disp": "wdm2"
+            },
+            {
+                "source": "t4",
+                "target": "r4",
+                "target_port_disp": "wdm2",
+                "source_port_disp": "wdm12  "
+            },
+            {
+                "source": "r4",
+                "target": "t4",
+                "target_port_disp": "wdm13",
+                "source_port_disp": "wdm3"
+            },
+            {
+                "source": "t4",
+                "target": "r4",
+                "target_port_disp": "wdm3",
+                "source_port_disp": "wdm13  "
+            },
+            {
+                "source": "r4",
+                "target": "t4",
+                "target_port_disp": "wdm14",
+                "source_port_disp": "wdm4"
+            },
+            {
+                "source": "t4",
+                "target": "r4",
+                "target_port_disp": "wdm4",
+                "source_port_disp": "wdm14  "
+            },
+            {
+                "source": "r4",
+                "target": "t4",
+                "target_port_disp": "wdm15",
+                "source_port_disp": "wdm5"
+            },
+            {
+                "source": "t4",
+                "target": "r4",
+                "target_port_disp": "wdm5",
+                "source_port_disp": "wdm15  "
+            },
+            {
+                "source": "r4",
+                "target": "t4",
+                "target_port_disp": "wdm16",
+                "source_port_disp": "wdm6"
+            },
+            {
+                "source": "t4",
+                "target": "r4",
+                "target_port_disp": "wdm6",
+                "source_port_disp": "wdm16  "
+            },
+            {
+                "source": "r5",
+                "target": "r6",
+                "target_port_disp": "wdm111",
+                "source_port_disp": "wdm222"
+            },
+            {
+                "source": "r6",
+                "target": "r5",
+                "target_port_disp": "wdm222",
+                "source_port_disp": "wdm111  "
+            },
+            {
+                "source": "r5",
+                "target": "t5",
+                "target_port_disp": "wdm11",
+                "source_port_disp": "wdm1"
+            },
+            {
+                "source": "t5",
+                "target": "r5",
+                "target_port_disp": "wdm1",
+                "source_port_disp": "wdm11  "
+            },
+            {
+                "source": "r5",
+                "target": "t5",
+                "target_port_disp": "wdm12",
+                "source_port_disp": "wdm2"
+            },
+            {
+                "source": "t5",
+                "target": "r5",
+                "target_port_disp": "wdm2",
+                "source_port_disp": "wdm12  "
+            },
+            {
+                "source": "r5",
+                "target": "t5",
+                "target_port_disp": "wdm13",
+                "source_port_disp": "wdm3"
+            },
+            {
+                "source": "t5",
+                "target": "r5",
+                "target_port_disp": "wdm3",
+                "source_port_disp": "wdm13  "
+            },
+            {
+                "source": "r5",
+                "target": "t5",
+                "target_port_disp": "wdm14",
+                "source_port_disp": "wdm4"
+            },
+            {
+                "source": "t5",
+                "target": "r5",
+                "target_port_disp": "wdm4",
+                "source_port_disp": "wdm14  "
+            },
+            {
+                "source": "r5",
+                "target": "t5",
+                "target_port_disp": "wdm15",
+                "source_port_disp": "wdm5"
+            },
+            {
+                "source": "t5",
+                "target": "r5",
+                "target_port_disp": "wdm5",
+                "source_port_disp": "wdm15  "
+            },
+            {
+                "source": "r5",
+                "target": "t5",
+                "target_port_disp": "wdm16",
+                "source_port_disp": "wdm6"
+            },
+            {
+                "source": "t5",
+                "target": "r5",
+                "target_port_disp": "wdm6",
+                "source_port_disp": "wdm16  "
+            },
+            {
+                "source": "r6",
+                "target": "r1",
+                "target_port_disp": "wdm111",
+                "source_port_disp": "wdm222"
+            },
+            {
+                "source": "r1",
+                "target": "r6",
+                "target_port_disp": "wdm222",
+                "source_port_disp": "wdm111  "
+            },
+            {
+                "source": "r6",
+                "target": "t6",
+                "target_port_disp": "wdm11",
+                "source_port_disp": "wdm1"
+            },
+            {
+                "source": "t6",
+                "target": "r6",
+                "target_port_disp": "wdm1",
+                "source_port_disp": "wdm11  "
+            },
+            {
+                "source": "r6",
+                "target": "t6",
+                "target_port_disp": "wdm12",
+                "source_port_disp": "wdm2"
+            },
+            {
+                "source": "t6",
+                "target": "r6",
+                "target_port_disp": "wdm2",
+                "source_port_disp": "wdm12  "
+            },
+            {
+                "source": "r6",
+                "target": "t6",
+                "target_port_disp": "wdm13",
+                "source_port_disp": "wdm3"
+            },
+            {
+                "source": "t6",
+                "target": "r6",
+                "target_port_disp": "wdm3",
+                "source_port_disp": "wdm13  "
+            },
+            {
+                "source": "r6",
+                "target": "t6",
+                "target_port_disp": "wdm14",
+                "source_port_disp": "wdm4"
+            },
+            {
+                "source": "t6",
+                "target": "r6",
+                "target_port_disp": "wdm4",
+                "source_port_disp": "wdm14  "
+            },
+            {
+                "source": "r6",
+                "target": "t6",
+                "target_port_disp": "wdm15",
+                "source_port_disp": "wdm5"
+            },
+            {
+                "source": "t6",
+                "target": "r6",
+                "target_port_disp": "wdm5",
+                "source_port_disp": "wdm15  "
+            },
+            {
+                "source": "r6",
+                "target": "t6",
+                "target_port_disp": "wdm16",
+                "source_port_disp": "wdm6"
+            },
+            {
+                "source": "t6",
+                "target": "r6",
+                "target_port_disp": "wdm6",
+                "source_port_disp": "wdm16  "
+            },
+            {
+                "source": "s1",
+                "target": "t1",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1"
+            },
+            {
+                "source": "t1",
+                "target": "s1",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1  "
+            },
+            {
+                "source": "s1",
+                "target": "t1",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2"
+            },
+            {
+                "source": "t1",
+                "target": "s1",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2  "
+            },
+            {
+                "source": "s1",
+                "target": "t1",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3"
+            },
+            {
+                "source": "t1",
+                "target": "s1",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3  "
+            },
+            {
+                "source": "s1",
+                "target": "t1",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4"
+            },
+            {
+                "source": "t1",
+                "target": "s1",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4  "
+            },
+            {
+                "source": "s1",
+                "target": "t1",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5"
+            },
+            {
+                "source": "t1",
+                "target": "s1",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5  "
+            },
+            {
+                "source": "s1",
+                "target": "t1",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6"
+            },
+            {
+                "source": "t1",
+                "target": "s1",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6  "
+            },
+            {
+                "source": "s2",
+                "target": "t2",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1"
+            },
+            {
+                "source": "t2",
+                "target": "s2",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1  "
+            },
+            {
+                "source": "s2",
+                "target": "t2",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2"
+            },
+            {
+                "source": "t2",
+                "target": "s2",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2  "
+            },
+            {
+                "source": "s2",
+                "target": "t2",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3"
+            },
+            {
+                "source": "t2",
+                "target": "s2",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3  "
+            },
+            {
+                "source": "s2",
+                "target": "t2",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4"
+            },
+            {
+                "source": "t2",
+                "target": "s2",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4  "
+            },
+            {
+                "source": "s2",
+                "target": "t2",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5"
+            },
+            {
+                "source": "t2",
+                "target": "s2",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5  "
+            },
+            {
+                "source": "s2",
+                "target": "t2",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6"
+            },
+            {
+                "source": "t2",
+                "target": "s2",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6  "
+            },
+            {
+                "source": "s3",
+                "target": "t3",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1"
+            },
+            {
+                "source": "t3",
+                "target": "s3",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1  "
+            },
+            {
+                "source": "s3",
+                "target": "t3",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2"
+            },
+            {
+                "source": "t3",
+                "target": "s3",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2  "
+            },
+            {
+                "source": "s3",
+                "target": "t3",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3"
+            },
+            {
+                "source": "t3",
+                "target": "s3",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3  "
+            },
+            {
+                "source": "s3",
+                "target": "t3",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4"
+            },
+            {
+                "source": "t3",
+                "target": "s3",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4  "
+            },
+            {
+                "source": "s3",
+                "target": "t3",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5"
+            },
+            {
+                "source": "t3",
+                "target": "s3",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5  "
+            },
+            {
+                "source": "s3",
+                "target": "t3",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6"
+            },
+            {
+                "source": "t3",
+                "target": "s3",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6  "
+            },
+            {
+                "source": "s4",
+                "target": "t4",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1"
+            },
+            {
+                "source": "t4",
+                "target": "s4",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1  "
+            },
+            {
+                "source": "s4",
+                "target": "t4",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2"
+            },
+            {
+                "source": "t4",
+                "target": "s4",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2  "
+            },
+            {
+                "source": "s4",
+                "target": "t4",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3"
+            },
+            {
+                "source": "t4",
+                "target": "s4",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3  "
+            },
+            {
+                "source": "s4",
+                "target": "t4",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4"
+            },
+            {
+                "source": "t4",
+                "target": "s4",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4  "
+            },
+            {
+                "source": "s4",
+                "target": "t4",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5"
+            },
+            {
+                "source": "t4",
+                "target": "s4",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5  "
+            },
+            {
+                "source": "s4",
+                "target": "t4",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6"
+            },
+            {
+                "source": "t4",
+                "target": "s4",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6  "
+            },
+            {
+                "source": "s5",
+                "target": "t5",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1"
+            },
+            {
+                "source": "t5",
+                "target": "s5",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1  "
+            },
+            {
+                "source": "s5",
+                "target": "t5",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2"
+            },
+            {
+                "source": "t5",
+                "target": "s5",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2  "
+            },
+            {
+                "source": "s5",
+                "target": "t5",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3"
+            },
+            {
+                "source": "t5",
+                "target": "s5",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3  "
+            },
+            {
+                "source": "s5",
+                "target": "t5",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4"
+            },
+            {
+                "source": "t5",
+                "target": "s5",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4  "
+            },
+            {
+                "source": "s5",
+                "target": "t5",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5"
+            },
+            {
+                "source": "t5",
+                "target": "s5",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5  "
+            },
+            {
+                "source": "s5",
+                "target": "t5",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6"
+            },
+            {
+                "source": "t5",
+                "target": "s5",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6  "
+            },
+            {
+                "source": "s6",
+                "target": "t6",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1"
+            },
+            {
+                "source": "t6",
+                "target": "s6",
+                "target_port_disp": "eth1",
+                "source_port_disp": "eth1  "
+            },
+            {
+                "source": "s6",
+                "target": "t6",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2"
+            },
+            {
+                "source": "t6",
+                "target": "s6",
+                "target_port_disp": "eth2",
+                "source_port_disp": "eth2  "
+            },
+            {
+                "source": "s6",
+                "target": "t6",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3"
+            },
+            {
+                "source": "t6",
+                "target": "s6",
+                "target_port_disp": "eth3",
+                "source_port_disp": "eth3  "
+            },
+            {
+                "source": "s6",
+                "target": "t6",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4"
+            },
+            {
+                "source": "t6",
+                "target": "s6",
+                "target_port_disp": "eth4",
+                "source_port_disp": "eth4  "
+            },
+            {
+                "source": "s6",
+                "target": "t6",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5"
+            },
+            {
+                "source": "t6",
+                "target": "s6",
+                "target_port_disp": "eth5",
+                "source_port_disp": "eth5  "
+            },
+            {
+                "source": "s6",
+                "target": "t6",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6"
+            },
+            {
+                "source": "t6",
+                "target": "s6",
+                "target_port_disp": "eth6",
+                "source_port_disp": "eth6 "
+            }
         ]
     }
 }
