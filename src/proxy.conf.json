@@ -1,0 +1,7 @@
+{
+    "/": {
+      "target": "https://firebasestorage.googleapis.com/v0/b/mininet-optical-file-system.appspot.com",
+      "secure": false,
+      "changeOrigin": true
+    }
+  }

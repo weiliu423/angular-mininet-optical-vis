@@ -8,7 +8,9 @@ import { SigmaVisComponent } from './sigma-vis/sigma-vis.component';
 import { D3VisComponent } from './d3-vis/d3-vis.component';
 import { HttpClientModule } from '@angular/common/http';
 import { D3NetworkComponent } from './d3-network/d3-network.component';
-
+import { environment } from 'src/environments/environment';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 @NgModule({
   declarations: [
     AppComponent,
@@ -20,7 +22,9 @@ import { D3NetworkComponent } from './d3-network/d3-network.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule
   ],
   providers: [HttpClientModule],
   bootstrap: [AppComponent]

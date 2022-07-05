@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "mininet-optical-file-system",
+  "private_key_id": "3c125a1f0763c0a77b29b1ee2a6db7e4e31eb1d3",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCl4hGjpOdKPq0t\neieUQcSdM+B4G7dGq5IcTGDcs6FMa82GAZ62LZCCMzo4a7oSFnONyq2ahNMmTwNT\nU045UIWmYcDkxTHdW0jenax3ggbrxCsFSTpG2bEcAEvu5aATv0PnmGTXGizHPblU\nZtBfa45Ttl+zJSfwwmxzU3hjjGXPtW0MkQ8rL97jJIGbsDSbLxqaHLHKN8juF/oo\nTtSbbJqkir7CtFZLZ5xwOgAazA0XIucvM64yb0FuCsW53gtzRYJ5l8xpLl5xrr3M\ni1oZ5WzYusGvqOWrN/DqGJiSetuVYhRkEjmHgB5dupoFEB0raR7YZk9gjK1Z+wDg\nZkHYI7DNAgMBAAECggEAA1mku2OZSTpT/eBi8Wn/n3YnVn2mzq5TNy+YCt+026nX\nXtlkXBpg+gQwrOgzZpSd/6iEJ46prgh3+87ppvDYS33bawi22Fk03aFyaip4hc/y\ngiWSX/vFtC1RsJuMx1am94Pa0Nj7kQg52I7IBA6pyJ6HtxhCbX4bucY0iabRp+d3\niNt0sCgxwanf7agtRMhcaDMYh6jgACokXXRWQxOtOSM7LBmwrd/bFPkT39NgZWXH\ni7lrPiMZzFyq3m2iOmjn1+1tdST6g8n/tN0N1rEoJ2N5UTMURo6wkwZG9Mhvk6lG\nRvomq9YIRqklyFvWNJRH6w+bYTeSHtAQxF8DyZ7VqQKBgQDVBrs9CKdnIhA3Oz1Z\nkkkSsMKbiAGaDIkggRxgRsbc+LoducecFZWhsYN2aC0KAlShEzHbxoITXgn0qbAn\nw0UsL7nzoy4Xxo5COMLQiRMw9wllXq73E2kSDS+DCuMuwzCwWy4Erh4K0iM9NPiE\nDERDr3VRbBvY2671WNgNWjA6xQKBgQDHWLszk+mou0y/7y8oqo0/0Ava1L3Mz/ZB\ntR23m27NMkNLybBP2iKTxNK1jpj5KgPgb+xsf1zXQkgLkZKtJwF/NjsggAeYUXHI\nNkw2o9t3jqk+6oC7AWtE2PlmK/u6yud4U6jx0UTI3bn+oo1gBCYxwnFqG4UfJD4r\nEXxplx6eaQKBgQCTQmv87RaL/Mgo5hKq8K0C9p4Q1hwFWdURWy86frLJ3kcKdXq/\nM0yU0hmGqM05thK6poI44yjYKpHHR+Y2Fo6i1Ps+qPccCG4e6Q4DCj7yAlPEd4eL\n1Sc1C1hkxgn2MYhe4SkWoyaxZEJn9U42OiSWhZwcBRfa+UIg6KGx2T6t4QKBgQCK\njrIPd4/BJ+6Auc8dhO4InKKgx53k7edMZIbzR6YMGhOMafOSjRvbecK7TxIknX90\nUFcUUrJFLFzHLbe1gpcXxKn0PQkKZhGgB52RnPK+dvpMMNKpKKNWhzlSOuANRVr9\n16hl6/7TXsoYowOA6WFi1LPf/KDatGZBqTXAbrlpgQKBgQDH4vjOQkiLc73e6NWu\nnaX1gbKxsMF+OMoNJqlk1Sua4DckIU++aofJlm/572QgnlC+6XOWyNU7N8N+uZB8\nc6dLVZ+bvjhmHfi1XTBbxbeMdaEjCYYflXg07yVbX3ueL7YVAjH2bHmGqoyIsCIf\nYis7Rpbygp+TGXnHXQwQ1p1DhA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "mininet-optical-file-system@appspot.gserviceaccount.com",
+  "client_id": "109640828143367847988",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/mininet-optical-file-system%40appspot.gserviceaccount.com"
+}

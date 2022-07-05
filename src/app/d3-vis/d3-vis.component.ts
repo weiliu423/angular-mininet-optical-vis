@@ -13,6 +13,25 @@ import {
   import { HttpClient } from "@angular/common/http";
   import { Observable } from "rxjs";
 
+  // Import the functions you need from the SDKs you need
+   import { initializeApp } from "firebase/app";
+
+  // // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCeRkrVepStRHHP-5WuMgJ80f3hIfTLn_0",
+    authDomain: "mininet-optical-file-system.firebaseapp.com",
+    projectId: "mininet-optical-file-system",
+    storageBucket: "mininet-optical-file-system.appspot.com",
+    messagingSenderId: "752741188254",
+    appId: "1:752741188254:web:b113a9ec279d157325b18f"
+  };
+  
+  import { AngularFireStorage } from '@angular/fire/compat/storage';
+  import {  getStorage, ref, getDownloadURL, uploadString } from "firebase/storage";
+  
+  // Initialize Firebase
+  initializeApp(firebaseConfig);
+
   @Component({
     selector: "app-d3-vis",
     templateUrl: "./d3-vis.component.html",
@@ -20,8 +39,6 @@ import {
   })
   export class D3VisComponent implements OnInit {
     public isRendered = false;
-    private _jsonURL =
-      "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json";
     public network!: network;
     public networkData!: topo;
     public linksArray: links[] = [];
@@ -29,23 +46,24 @@ import {
     public selData: any;
     public preLinkProcess: boolean = false;
     public preNodeProcess: boolean = false;
-
-    constructor(private http: HttpClient) {
+    public nodeFileUrl: string = "";
+    public linkFileUrl: string = "";
+    public storageUrl: string = "gs://mininet-optical-file-system.appspot.com";
+    //profileUrl: Observable<string | null>;
+    constructor(private http: HttpClient, private storages: AngularFireStorage) {
     //   this.getJSON().subscribe((data) => {
     //     console.log(data);
     //     this.networkData = data;
     //   });
-      
+      this.networkData = new topo([], []);
+      this.firebaseGetLinkFile();
     }
   
     @ViewChild("topo_container", { read: ElementRef, static: true })
     svgContainerRef!: ElementRef<HTMLDivElement>;
   
     ngOnInit(): void {
-
-      this.networkData = new topo([], []);
-      
-      this.linkfileParse();      
+         
     }
   
     ngAfterContentInit() {
@@ -102,7 +120,7 @@ import {
         /*
                 force simulation
             */
-        let simulation = d3.forceSimulation().stop();
+        this.simulation = d3.forceSimulation().stop();
   
         /*
                 force
@@ -140,7 +158,7 @@ import {
           .drag()
           .on("start", (d: any) => {
             if (!d3.event.active) {
-              simulation.alphaTarget(0.3).restart();
+              this.simulation.alphaTarget(0.3).restart();
             }
   
             d.fx = d.x;
@@ -151,10 +169,10 @@ import {
             d.fy = d3.event.y;
           })
           .on("end", (d: any) => {
-            let simulation = this.topo["simulation"];
+            this.simulation = this.topo["simulation"];
   
             if (!d3.event.active) {
-              simulation.alphaTarget(0);
+              this.simulation.alphaTarget(0);
             }
   
             d.fx = null;
@@ -184,7 +202,6 @@ import {
           .attr("class", "tooltip")
           .offset([-10, 0])
           .html((d: any) => {
-            console.log(this.selData);
             d = this.selData;
             return (   
               "<p><strong class='title'>Name:</strong>" +
@@ -207,7 +224,7 @@ import {
         this.svg.call(link_dst_tip);
   
         if (this.animated) {
-          simulation
+          this.simulation
             .force("link", link_frc)
             .force("center", center_frc)
             .force("charge", charge_frc);
@@ -215,7 +232,7 @@ import {
   
         // keep track of topo components.
         this.topo = {
-          simulation: simulation,
+          simulation: this.simulation,
           link_force: link_frc,
           charge_force: charge_frc,
           center_force: center_frc,
@@ -244,7 +261,6 @@ import {
       d3.json("../../assets/data.json", (graph: any) => {
       // console.log(JSON.stringify(this.network));
       // d3.json(JSON.stringify(this.network), (graph: any) => {
-        console.log("ssssssssss", graph);
         graph = graph["topo"];
         // let links = [];
   
@@ -442,10 +458,8 @@ import {
           .enter()
           .append("g")
           .on("click", () => {
-            console.log("clicked IIIIIIIIIIIIIII");
           })
           .on("mouseover", (d: any, i: any, n: any) => {
-            console.log("mouseover", d, i, n);
             this.selData = d;
             d3.select(n[i]).classed("focus", true);
             return node_tip.show.apply(this, [n[i]]);
@@ -535,7 +549,7 @@ import {
         simulation.on("tick", () => {
           this.do_tick(link, node, desc);
         });
-  
+        this.simulation = simulation;
         this.do_layout();
       });
     }
@@ -619,16 +633,15 @@ import {
         center_frc = this.topo["center_force"],
         charge_frc = this.topo["charge_force"],
         link_frc = this.topo["link_force"];
-  
       if (!this.animated) {
-        simulation
+       simulation
           .force("center", center_frc)
           .force("charge", charge_frc)
           .force("link", link_frc);
       }
       simulation.alpha(1);
   
-      window.requestAnimationFrame(() => this.render());
+      window.requestAnimationFrame(() => this.render(simulation));
     }
   
     do_tick(
@@ -722,19 +735,19 @@ import {
       this.do_tick(link, node, desc);
     }
   
-    public ticks_per_render = 5;
-    render() {
-      for (let i = 0; i < this.ticks_per_render; i++) {
-        this.simulation.tick();
+    public ticks_per_render : number = 5;
+    render(simulation: any) {
+      for (let i = 0; i < 5; i++) {
+       simulation.tick;
       }
   
       this.do_one_tick();
   
-      if (this.simulation.alpha() > this.simulation.alphaMin()) {
+      if (simulation.alpha() > simulation.alphaMin()) {
         window.requestAnimationFrame(this.render);
       } else {
         if (!this.animated) {
-          this.simulation
+          simulation
             .force("center", null)
             .force("charge", null)
             .force("link", null);
@@ -747,7 +760,7 @@ import {
 
     nodefileParse()
     {
-        fetch('../../assets/nodes.txt')
+        fetch(this.nodeFileUrl)
         .then(response => response.text())
         .then(data => {
             for(let line of data.split(/[\r\n]+/))
@@ -780,8 +793,7 @@ import {
             this.networkData.nodes = this.nodeArray;
             this.preNodeProcess = true;
             this.network = new network(this.networkData);   
-            console.log(JSON.stringify(this.network))
-
+            this.firebaseUploadDataFile(JSON.stringify(this.network));
             this.initialize_topo();
             this.load();
         });
@@ -909,7 +921,7 @@ import {
 
     linkfileParse()
     {
-        fetch('../../assets/links.txt')
+        fetch(this.linkFileUrl)
         .then(response => response.text())
         .then(data => {
             for(let line of data.split(/[\r\n]+/))
@@ -956,10 +968,61 @@ import {
         this.linksArray.push(link);
     }
 
-    //#endregion
-  
-    public getJSON(): Observable<topo> {
-      return this.http.get<topo>(this._jsonURL);
+    firebaseGetNodeFile()
+    {
+      let storage = getStorage();
+      getDownloadURL(ref(storage, this.storageUrl + '/nodes.txt'))
+      .then((url) => {
+        // // This can be downloaded directly:
+        // const xhr = new XMLHttpRequest();
+        // xhr.responseType = 'blob';
+        // xhr.onload = (event) => {
+        //   const blob = xhr.response;
+        // };
+        // xhr.open('GET', url);
+        // xhr.send();
+
+        console.log(url);
+        this.nodeFileUrl = url;
+        this.linkfileParse();   
+      })
+      .catch((error) => {
+        // Handle any errors
+      });
     }
+    firebaseGetLinkFile()
+    {
+      let storage = getStorage();
+      getDownloadURL(ref(storage, this.storageUrl + '/links.txt'))
+      .then((url) => {
+        // `url` is the download URL for 'images/stars.jpg'
+
+        // // This can be downloaded directly:
+        // const xhr = new XMLHttpRequest();
+        // xhr.responseType = 'blob';
+        // xhr.onload = (event) => {
+        //   const blob = xhr.response;
+        // };
+        // xhr.open('GET', url);
+        // xhr.send();
+
+        console.log(url);
+        this.linkFileUrl = url;
+        this.firebaseGetNodeFile();
+      })
+      .catch((error) => {
+        // Handle any errors
+      });
+    }
+    firebaseUploadDataFile(data: string)
+    {
+      let storage = getStorage();
+      let storageRef = ref(storage, this.storageUrl+'/data.json');
+      uploadString(storageRef, data).then((snapshot) => {
+        console.log('Parsed data uploaded to Firebase storage');
+      });
+    }
+    //#endregion
+
   }
   
