@@ -3,15 +3,24 @@
 <script type="text/javascript" src="../../assets/d3-tip.js"></script>
 
 
-    <div>
-        <button id="load_btn">Load</button>
-        <button id="animated_btn">Static</button>
-        <select autocomplete="off" id="desc_field_selector">
-            <option value="mac" selected>MAC</option>
-            <option value='ip'>IP</option>
-            <option value='device_name'>Name</option>
-        </select>
+    <div class="row">
+        <div class="col">
+            <label>Nodes: &nbsp;</label>
+            <input id="preview" type="file" (change)="loadNodeFile($event)" />   
+        </div>
+        <br>
+        <div class="col">
+            <label>Links: &nbsp;&nbsp;&nbsp;</label>
+            <input id="preview" type="file" (change)="loadLinkFile($event)" />   
+        </div>
+        <br>
+        <button (click)="confirmLoad()">LOAD FILE VIEW</button>
     </div>
-    <svg #topo_container class="topo_container">
-        <rect id="view_container" x="0" y="0" class="topo_container"></rect>
-    </svg>
+    <div class="row">
+
+    </div>
+    <hr>
+
+        <svg #topo_container class="topo_container">
+            <rect id="view_container" x="0" y="0" class="topo_container"></rect>
+        </svg>

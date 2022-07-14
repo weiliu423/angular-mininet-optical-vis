@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
     Component,
     ElementRef,
     HostListener,
@@ -50,28 +51,28 @@ import {
     public linkFileUrl: string = "";
     public storageUrl: string = "gs://mininet-optical-file-system.appspot.com";
     //profileUrl: Observable<string | null>;
-    constructor(private http: HttpClient, private storages: AngularFireStorage) {
+    constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {
     //   this.getJSON().subscribe((data) => {
     //     console.log(data);
     //     this.networkData = data;
     //   });
       this.networkData = new topo([], []);
-      this.firebaseGetLinkFile();
+      
     }
   
     @ViewChild("topo_container", { read: ElementRef, static: true })
     svgContainerRef!: ElementRef<HTMLDivElement>;
   
     ngOnInit(): void {
-         
+      console.log(this.isRendered)
+      this.firebaseGetLinkFile();
     }
   
     ngAfterContentInit() {
-      //this.createChart();
+     
     }
     ngAfterViewInit(): void {
-      //this.createChart();
-      this.isRendered = true;
+
     }
   
     public topo: any; // keep track of topo.
@@ -85,6 +86,8 @@ import {
     public targetPort: any;
     public target: any;
     public portStatus: any;
+    public nodeFileString: string = "";
+    public linkFileString: string = "";
 
     //#region Initial Load/Layout Methods
     initialize_topo() {
@@ -249,7 +252,6 @@ import {
       /*
             load: load new nodes, links to simulation.
         */
-  
       let simulation = this.topo["simulation"],
         link_frc = this.topo["link_force"],
         drag = this.topo["drag"],
@@ -257,10 +259,12 @@ import {
         link_src_tip = this.topo["link_source_tip"],
         link_dst_tip = this.topo["link_dest_tip"],
         svg = d3.select(this.svgContainerRef.nativeElement);
-  
-      d3.json("../../assets/data.json", (graph: any) => {
+
+      console.log(this.dataJsonUrl)
+      d3.json(this.dataJsonUrl, (graph: any) => {
       // console.log(JSON.stringify(this.network));
       // d3.json(JSON.stringify(this.network), (graph: any) => {
+        console.log(JSON.stringify(graph));
         graph = graph["topo"];
         // let links = [];
   
@@ -760,6 +764,43 @@ import {
 
     nodefileParse()
     {
+      this.nodeArray = [];
+      if(this.nodeFileString != "")
+      {
+        for(let line of this.nodeFileString.split(/[\r\n]+/))
+            {
+                let nodeData :any = line.match(/\<(.*?)\>/);
+                if(nodeData != null)
+                {
+                    if(nodeData[1].includes('Host'))
+                    {
+                       this.hostParse(nodeData[1]);
+                    }
+                    else if(nodeData[1].includes('ROADM'))
+                    {
+                        this.roadmParse(nodeData[1]);
+                    }
+                    else if(nodeData[1].includes('OVSBridge'))
+                    {
+                        this.ovsbridgeParse(nodeData[1]);
+                    }
+                    else if(nodeData[1].includes('Terminal'))
+                    {
+                        this.terminalParse(nodeData[1]);
+
+                    }
+                    else{
+                      this.additionalParse('');
+                    }               
+                }           
+            };
+
+            this.networkData.nodes = this.nodeArray;
+            this.preNodeProcess = true;
+            this.network = new network(this.networkData);   
+            console.log(this.networkData);
+            this.firebaseUploadDataFile(JSON.stringify(this.network));
+      }else{
         fetch(this.nodeFileUrl)
         .then(response => response.text())
         .then(data => {
@@ -794,10 +835,9 @@ import {
             this.preNodeProcess = true;
             this.network = new network(this.networkData);   
             this.firebaseUploadDataFile(JSON.stringify(this.network));
-            this.initialize_topo();
-            this.load();
+            
         });
-        
+      }
     }
 
     public regexExp = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi;
@@ -921,6 +961,39 @@ import {
 
     linkfileParse()
     {
+      this.linksArray = [];
+      if(this.linkFileString != "")
+      {
+        console.log(this.linkFileString)
+        for(let line of this.linkFileString.split(/[\r\n]+/))
+            {
+                let status :any = line.match(/\((.*?)\)/);
+                if(status != null)
+                {
+                  if(status.length > 0)
+                  {                                 
+                      line.split('<->').forEach((element, i) => {
+                          element = element.replace(status[0], '');
+                          this.sourceName = element.split('-')[0];
+                          this.sourcePort = element.split('-')[1];
+                          if(i == 0)
+                          {
+                              this.target = line.split('<->')[i+1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
+                              this.targetPort = line.split('<->')[i+1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
+                          }else{
+                              this.target = line.split('<->')[i-1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
+                              this.targetPort = line.split('<->')[i-1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
+                          }
+                          this.addLink(this.sourceName, this.sourcePort, this.target, this.targetPort);
+                      });
+                  }
+                }
+            }
+            console.log(this.linksArray)
+            this.networkData.links = this.linksArray;
+            this.preLinkProcess = true;
+            this.nodefileParse(); 
+      }else{
         fetch(this.linkFileUrl)
         .then(response => response.text())
         .then(data => {
@@ -952,6 +1025,7 @@ import {
             this.preLinkProcess = true;
             this.nodefileParse();         
         });  
+      }
     }
 
     addLink(source: string, sourcePortName: string, target: string, targetPortName : string)
@@ -1014,13 +1088,63 @@ import {
         // Handle any errors
       });
     }
+    public dataJsonUrl : string = "";
+    firebaseGetDataFile()
+    {
+      let storage = getStorage();
+      getDownloadURL(ref(storage, this.storageUrl + '/data.json'))
+      .then((url) => {
+        console.log(url);
+        this.dataJsonUrl = url;
+        this.initialize_topo();
+        this.load();
+        return url;
+      })
+      .catch((error) => {
+        // Handle any errors
+        return "";
+      });
+      return this.dataJsonUrl;
+    }
     firebaseUploadDataFile(data: string)
     {
       let storage = getStorage();
       let storageRef = ref(storage, this.storageUrl+'/data.json');
       uploadString(storageRef, data).then((snapshot) => {
         console.log('Parsed data uploaded to Firebase storage');
+        this.firebaseGetDataFile();
       });
+    }
+    loadNodeFile(event: any) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        console.log('content', e.target.result);
+        const text = atob(e.target.result.split(",")[1]);
+        this.nodeFileString = text;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+    loadLinkFile(event: any) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        console.log('content', e.target.result);
+        const text = atob(e.target.result.split(",")[1]);
+        this.linkFileString = text;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+    confirmLoad()
+    {
+      if(this.nodeFileString != "" && this.linkFileString != "")
+      {
+        
+        //d3.select(this.svgContainerRef.nativeElement).selectAll("g.links").remove();//add this to remove the links
+        //d3.select(this.svgContainerRef.nativeElement).selectAll("g.nodes").remove();//add this to remove the nodes
+        this.linkfileParse();
+        this.cdr.detectChanges();
+      }else{
+        alert('Please load node and link file');
+      }
     }
     //#endregion
 
