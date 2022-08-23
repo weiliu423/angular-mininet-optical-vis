@@ -2,22 +2,19 @@ import {
   ChangeDetectorRef,
     Component,
     ElementRef,
-    HostListener,
-    Input,
     OnInit,
-    SimpleChanges,
     ViewChild,
   } from "@angular/core";
   var d3 = require("d3");
   var D3Tip = require("../../assets/d3-tip.js");
   import { links, network, nodes, topo } from "../models/data-network.model";
   import { HttpClient } from "@angular/common/http";
-  import { Observable } from "rxjs";
-
-  // Import the functions you need from the SDKs you need
-   import { initializeApp } from "firebase/app";
-
-  // // Your web app's Firebase configuration
+  import { Observable, Observer, fromEvent, merge } from 'rxjs';
+  import { map } from 'rxjs/operators';   
+  import {  getStorage, ref, getDownloadURL, uploadString } from "firebase/storage";
+  import { initializeApp } from "firebase/app";
+  import { NotifierService } from 'angular-notifier';
+  //Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCeRkrVepStRHHP-5WuMgJ80f3hIfTLn_0",
     authDomain: "mininet-optical-file-system.firebaseapp.com",
@@ -26,12 +23,6 @@ import {
     messagingSenderId: "752741188254",
     appId: "1:752741188254:web:b113a9ec279d157325b18f"
   };
-  
-  import { AngularFireStorage } from '@angular/fire/compat/storage';
-  import {  getStorage, ref, getDownloadURL, uploadString } from "firebase/storage";
-  
-  // Initialize Firebase
-  initializeApp(firebaseConfig);
 
   @Component({
     selector: "app-d3-vis",
@@ -39,42 +30,54 @@ import {
     styleUrls: ["./d3-vis.component.css"],
   })
   export class D3VisComponent implements OnInit {
+
     public isRendered = false;
+    public isNetworkOnline = false;
+    private readonly notifier: NotifierService;
+
+    constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private notifierService: NotifierService) {
+      this.networkData = new topo([], []);
+      this.notifier = notifierService;
+      // Initialize Firebase
+      try{
+        initializeApp(firebaseConfig);
+      }catch(err)
+      {
+        console.log(err)
+      }
+    }
+    /////////////////////////////////////////////////////////////////
+    public bntStyle : string = "btn btn-xl btn-danger disabled";
+    public firebaseStatus : string = "500 - Internal Error";
+    public loadFileStatus : string = "404 - Not Found";
+    public apiStatus : string = "500 - Internal Error";
+    public firebaseStatusStyle : string = "text-danger";
+    public loadFileStatuStyle : string = "text-danger";
+    public apiStatusStyle : string = "text-danger";
+    /////////////////////////////////////////////////////////////////
+
+    @ViewChild("topo_container", { read: ElementRef, static: true })
+    svgContainerRef!: ElementRef<HTMLDivElement>;
+    @ViewChild('nodeSelection')
+    nodeSelection!: ElementRef;  
+    @ViewChild('linkSelection')
+    linkSelection!: ElementRef;
+
+    ngOnInit(): void {
+      console.log(this.isRendered)
+      this.createOnline$().subscribe(isOnline => this.isNetworkOnline = isOnline);
+      if(this.isNetworkOnline)
+      {
+        this.firebaseGetDataFile();
+      }
+    }
+
+    //#region Initial Load/Layout Methods
+    public selData: any;
     public network!: network;
     public networkData!: topo;
     public linksArray: links[] = [];
     public nodeArray: nodes[] = [];
-    public selData: any;
-    public preLinkProcess: boolean = false;
-    public preNodeProcess: boolean = false;
-    public nodeFileUrl: string = "";
-    public linkFileUrl: string = "";
-    public storageUrl: string = "gs://mininet-optical-file-system.appspot.com";
-    //profileUrl: Observable<string | null>;
-    constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {
-    //   this.getJSON().subscribe((data) => {
-    //     console.log(data);
-    //     this.networkData = data;
-    //   });
-      this.networkData = new topo([], []);
-      
-    }
-  
-    @ViewChild("topo_container", { read: ElementRef, static: true })
-    svgContainerRef!: ElementRef<HTMLDivElement>;
-  
-    ngOnInit(): void {
-      console.log(this.isRendered)
-      this.firebaseGetLinkFile();
-    }
-  
-    ngAfterContentInit() {
-     
-    }
-    ngAfterViewInit(): void {
-
-    }
-  
     public topo: any; // keep track of topo.
     public animated: boolean = false; // animated or static
     public svg: any;
@@ -86,10 +89,6 @@ import {
     public targetPort: any;
     public target: any;
     public portStatus: any;
-    public nodeFileString: string = "";
-    public linkFileString: string = "";
-
-    //#region Initial Load/Layout Methods
     initialize_topo() {
       /*
             create container for links and nodes elements.
@@ -114,10 +113,10 @@ import {
       // /*
       //     debug
       // */
-      // let inter_nodes = svg.select('g.intermediate_nodes');
-      // if (!inter_nodes.size()) {
-      //     inter_nodes = svg.append('g').attr('class', 'intermediate_nodes');
-      // }
+      let inter_nodes = this.svg.select('g.intermediate_nodes');
+      if (!inter_nodes.size()) {
+          inter_nodes = this.svg.append('g').attr('class', 'intermediate_nodes');
+      }
   
       if (!this.topo) {
         /*
@@ -133,23 +132,25 @@ import {
             .id((d: any) => {
               return d.id;
             })
-            .distance(function (d: any) {
-              if ("id" in d.source && "id" in d.target) {
-                return 120;
-              } else {
-                return 60;
-              }
+            .distance(function (d: any, i : any) {
+              // if ("id" in d.source 
+              // //&& "id" in d.target
+              // ) {
+                return i==4 ? 2000 : -500;
+              // } else {
+              //   return 60;
+              // }
             }),
           charge_frc = d3
             .forceManyBody()
             .strength((d: any) => {
               if ("id" in d) {
-                return -160;
+                return -150;
               } else {
-                return -200;
+                return -50;
               }
             })
-            .distanceMax(300),
+            .distanceMax(200),
           center_frc = d3.forceCenter();
   
         /*
@@ -225,12 +226,12 @@ import {
           link_dst_tip = D3Tip().attr("class", "tooltip");
         this.svg.call(link_src_tip);
         this.svg.call(link_dst_tip);
-  
+
         if (this.animated) {
           this.simulation
-            .force("link", link_frc)
-            .force("center", center_frc)
-            .force("charge", charge_frc);
+            //.force("link", link_frc)
+            //.force("center", center_frc)
+            //.force("charge", charge_frc);
         }
   
         // keep track of topo components.
@@ -260,7 +261,10 @@ import {
         link_dst_tip = this.topo["link_dest_tip"],
         svg = d3.select(this.svgContainerRef.nativeElement);
 
-      console.log(this.dataJsonUrl)
+      if(!this.isNetworkOnline)
+      {
+        this.dataJsonUrl = "";
+      }
       d3.json(this.dataJsonUrl, (graph: any) => {
       // console.log(JSON.stringify(this.network));
       // d3.json(JSON.stringify(this.network), (graph: any) => {
@@ -759,9 +763,198 @@ import {
       }
     }
     //#endregion
-
     //#region Helper Methods
+    resetNodeSelection() {
+      console.log(this.nodeSelection.nativeElement.files);
+      this.nodeSelection.nativeElement.value = "";
+      console.log(this.nodeSelection.nativeElement.files);
+    }
+    resetLinkSelection() {
+      console.log(this.linkSelection.nativeElement.files);
+      this.linkSelection.nativeElement.value = "";
+      console.log(this.linkSelection.nativeElement.files);
+    }
+    createOnline$() {
+      return merge<any>(
+        fromEvent(window, 'offline').pipe(map(() => false)),
+        fromEvent(window, 'online').pipe(map(() => true)),
+        new Observable((sub: Observer<boolean>) => {
+          sub.next(navigator.onLine);
+          sub.complete();
+        }));
+    }
+    //#endregion  
+    //#region Firebase Methods
+    public storageUrl: string = "gs://mininet-optical-file-system.appspot.com";
+    //################## Firebase ###############################  
+    firebaseGetNodeFile()
+    {
+      let storage = getStorage();
+      getDownloadURL(ref(storage, this.storageUrl + '/nodes.txt'))
+      .then((url) => {
+        // // This can be downloaded directly:
+        // const xhr = new XMLHttpRequest();
+        // xhr.responseType = 'blob';
+        // xhr.onload = (event) => {
+        //   const blob = xhr.response;
+        // };
+        // xhr.open('GET', url);
+        // xhr.send();
 
+        console.log(url);
+        this.nodeFileUrl = url;
+        this.linkfileParse(); 
+        this.notifier.notify('success', 'Firebase server connected.');  
+      })
+      .catch((error) => {
+        // Handle any errors
+        this.notifier.notify('error', 'Firebase file failed to load!');  
+      });
+    }
+    firebaseGetLinkFile()
+    {
+      let storage = getStorage();
+      
+      getDownloadURL(ref(storage, this.storageUrl + '/links.txt'))
+      .then((url) => {
+        // `url` is the download URL for 'images/stars.jpg'
+
+        // // This can be downloaded directly:
+        // const xhr = new XMLHttpRequest();
+        // xhr.responseType = 'blob';
+        // xhr.onload = (event) => {
+        //   const blob = xhr.response;
+        // };
+        // xhr.open('GET', url);
+        // xhr.send();
+
+        console.log(url);
+        this.linkFileUrl = url;
+        this.firebaseGetNodeFile();
+        this.firebaseStatus = "200 - Success";
+        this.firebaseStatusStyle = "text-success";
+        
+      })
+      .catch((error) => {
+        // Handle any errors
+        this.firebaseStatus = "500 - Internal Error";
+        this.firebaseStatusStyle = "text-danger";
+      });
+    }
+    public dataJsonUrl : string = "";
+    firebaseGetDataFile()
+    {
+      try {
+        
+        let storage = getStorage();
+        getDownloadURL(ref(storage, this.storageUrl + '/data.json'))
+        .then((url) => {
+          console.log(url);
+          this.dataJsonUrl = url;
+          this.initialize_topo();
+          this.load();
+          return url;
+        })
+        .catch((error) => {
+          // Handle any errors
+          console.log(error)
+          this.firebaseStatus = "500 - Internal Error";
+          this.firebaseStatusStyle = "text-danger";
+          this.notifier.notify('error', 'Not able to connect to server!'); 
+        });
+        //return this.dataJsonUrl;
+      }catch(e)
+      {
+        console.log(e)
+      } 
+      
+    }
+    firebaseUploadDataFile(data: string)
+    {
+      let storage = getStorage();
+      let storageRef = ref(storage, this.storageUrl+'/data.json');
+      uploadString(storageRef, data).then((snapshot) => {
+        console.log('Parsed data uploaded to Firebase storage');
+        this.firebaseGetDataFile();
+      });
+    }
+    //#endregion
+    //#region File Parse Methods
+    public nodeFileString: string = "";
+    public linkFileString: string = "";
+    public nodeFileLoaded : boolean = false;
+    public linkFileLoaded : boolean = false;
+    public preLinkProcess: boolean = false;
+    public preNodeProcess: boolean = false;
+    public nodeFileUrl: string = "";
+    public linkFileUrl: string = "";
+    //###############################################################  
+    loadNodeFile(event: any) {
+      const file = event.target.files[0];
+      console.log('type', file.type);
+      if(file.type == "text/plain")
+      {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          console.log('content', e.target.result);
+          const text = atob(e.target.result.split(",")[1]);
+          this.nodeFileString = text;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+        this.nodeFileLoaded = true;
+        if(this.linkFileLoaded)
+        {
+          this.bntStyle = "btn btn-xl btn-success";
+        }
+        this.notifier.notify('success', 'Node file added.');  
+      }else{
+        alert('Please choose the correct .txt file');
+        this.resetNodeSelection()
+        this.nodeFileLoaded = false;
+        this.nodeFileString = "";
+      }
+    }
+    loadLinkFile(event: any) {
+      const file = event.target.files[0];
+      console.log('type', file.type);
+      if(file.type == "text/plain")
+      {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          const text = atob(e.target.result.split(",")[1]);
+          this.linkFileString = text;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+        this.linkFileLoaded = true;
+        if(this.nodeFileLoaded)
+        {
+          this.bntStyle = "btn btn-xl btn-success";
+        }
+        this.notifier.notify('success', 'links file added.');  
+      }
+      else{
+        alert('Please choose the correct .txt file');
+        this.resetLinkSelection();
+        this.linkFileLoaded = false;
+        this.linkFileString = "";
+      }
+    }
+    confirmLoad()
+    {
+      if(this.nodeFileString != "" && this.linkFileString != "")
+      {
+        //d3.select(this.svgContainerRef.nativeElement).selectAll("g.links").remove();//add this to remove the links
+        //d3.select(this.svgContainerRef.nativeElement).selectAll("g.nodes").remove();//add this to remove the nodes
+        this.linkfileParse();
+        this.cdr.detectChanges();
+        this.loadFileStatus = "Files loaded";
+        this.loadFileStatuStyle = "text-success"
+        this.notifier.notify('success', 'File loaded successfully!');
+      }else{
+        alert('Please load node and link file');
+        this.loadFileStatuStyle = "text-danger"
+      }
+    }
     nodefileParse()
     {
       this.nodeArray = [];
@@ -799,7 +992,12 @@ import {
             this.preNodeProcess = true;
             this.network = new network(this.networkData);   
             console.log(this.networkData);
-            this.firebaseUploadDataFile(JSON.stringify(this.network));
+            if(this.isNetworkOnline)
+            {
+              this.firebaseUploadDataFile(JSON.stringify(this.network));
+            }
+            this.initialize_topo();
+            this.load();
       }else{
         fetch(this.nodeFileUrl)
         .then(response => response.text())
@@ -834,6 +1032,7 @@ import {
             this.networkData.nodes = this.nodeArray;
             this.preNodeProcess = true;
             this.network = new network(this.networkData);   
+            this.notifier.notify('success', 'Online file rendered.');  
             this.firebaseUploadDataFile(JSON.stringify(this.network));
             
         });
@@ -964,7 +1163,7 @@ import {
       this.linksArray = [];
       if(this.linkFileString != "")
       {
-        console.log(this.linkFileString)
+        console.log("link file parse ",this.linkFileString)
         for(let line of this.linkFileString.split(/[\r\n]+/))
             {
                 let status :any = line.match(/\((.*?)\)/);
@@ -1041,111 +1240,7 @@ import {
         //{"source": "s0", "target_port_disp": "port_1", "source_port_disp": "port_7", "target": "s4"}
         this.linksArray.push(link);
     }
-
-    firebaseGetNodeFile()
-    {
-      let storage = getStorage();
-      getDownloadURL(ref(storage, this.storageUrl + '/nodes.txt'))
-      .then((url) => {
-        // // This can be downloaded directly:
-        // const xhr = new XMLHttpRequest();
-        // xhr.responseType = 'blob';
-        // xhr.onload = (event) => {
-        //   const blob = xhr.response;
-        // };
-        // xhr.open('GET', url);
-        // xhr.send();
-
-        console.log(url);
-        this.nodeFileUrl = url;
-        this.linkfileParse();   
-      })
-      .catch((error) => {
-        // Handle any errors
-      });
-    }
-    firebaseGetLinkFile()
-    {
-      let storage = getStorage();
-      getDownloadURL(ref(storage, this.storageUrl + '/links.txt'))
-      .then((url) => {
-        // `url` is the download URL for 'images/stars.jpg'
-
-        // // This can be downloaded directly:
-        // const xhr = new XMLHttpRequest();
-        // xhr.responseType = 'blob';
-        // xhr.onload = (event) => {
-        //   const blob = xhr.response;
-        // };
-        // xhr.open('GET', url);
-        // xhr.send();
-
-        console.log(url);
-        this.linkFileUrl = url;
-        this.firebaseGetNodeFile();
-      })
-      .catch((error) => {
-        // Handle any errors
-      });
-    }
-    public dataJsonUrl : string = "";
-    firebaseGetDataFile()
-    {
-      let storage = getStorage();
-      getDownloadURL(ref(storage, this.storageUrl + '/data.json'))
-      .then((url) => {
-        console.log(url);
-        this.dataJsonUrl = url;
-        this.initialize_topo();
-        this.load();
-        return url;
-      })
-      .catch((error) => {
-        // Handle any errors
-        return "";
-      });
-      return this.dataJsonUrl;
-    }
-    firebaseUploadDataFile(data: string)
-    {
-      let storage = getStorage();
-      let storageRef = ref(storage, this.storageUrl+'/data.json');
-      uploadString(storageRef, data).then((snapshot) => {
-        console.log('Parsed data uploaded to Firebase storage');
-        this.firebaseGetDataFile();
-      });
-    }
-    loadNodeFile(event: any) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        console.log('content', e.target.result);
-        const text = atob(e.target.result.split(",")[1]);
-        this.nodeFileString = text;
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
-    loadLinkFile(event: any) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        console.log('content', e.target.result);
-        const text = atob(e.target.result.split(",")[1]);
-        this.linkFileString = text;
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
-    confirmLoad()
-    {
-      if(this.nodeFileString != "" && this.linkFileString != "")
-      {
-        
-        //d3.select(this.svgContainerRef.nativeElement).selectAll("g.links").remove();//add this to remove the links
-        //d3.select(this.svgContainerRef.nativeElement).selectAll("g.nodes").remove();//add this to remove the nodes
-        this.linkfileParse();
-        this.cdr.detectChanges();
-      }else{
-        alert('Please load node and link file');
-      }
-    }
+    //###############################################################  
     //#endregion
 
   }
