@@ -31,12 +31,15 @@
               {"glob": "**/*", "input":"./node_modules/sigma/build", "output": "/assets/lib" }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/angular-notifier/styles/core.css",
+              "node_modules/angular-notifier/styles.css"     
+            
             ],
-            "scripts": ["src/assets/sigma.conf.js",
-              
-              "node_modules/sigma/build/sigma.min.js",
-              "node_modules/sigma/build/sigma.js"]
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.js"
+            ]
           },
           "configurations": {
             "production": {

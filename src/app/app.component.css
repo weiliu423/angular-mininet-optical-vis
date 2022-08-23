@@ -57,7 +57,7 @@
   }
 
   .content {
-    display: flex;
+
     margin: 82px auto 32px;
     padding: 0 16px;
     flex-direction: column;
@@ -246,14 +246,6 @@
     height: 16px;
     width: 16px;
     margin-right: 4px;
-  }
-
-  svg#clouds {
-    position: fixed;
-    bottom: -160px;
-    left: -230px;
-    z-index: -10;
-    width: 1920px;
   }
 
   /* Responsive Styles */

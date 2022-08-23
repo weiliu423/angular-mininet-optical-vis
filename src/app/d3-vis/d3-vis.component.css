@@ -1,5 +1,20 @@
-.topo_container{
-    height: 2000px;
+
+
+.btn-xl {
+    padding: 10px 20px;
+    border-radius: 10px;
+    width:100%;
+}
+.filestyle{
+    width:100%;
+}
+table {
+
+    width: 30%;
+    float: right;
+ }
+
+svg{
     width: 100%;
-    background: white;
+    height:70rem;
 }
