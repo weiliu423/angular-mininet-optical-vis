@@ -129,24 +129,43 @@ import {
             .id((d: any) => {
               return d.id;
             })
-            .distance(function (d: any, i : any) {
+            .distance( (d: any, i : any) => {
               //console.log(d.source)
-               if (d.source.device_info == 'Host' 
-             // && "id" in d.target
-             ) {
-                 return 1100;
-             } else {
-                 return 60;
-            }
+             if (d.source.device_info == 'Host') 
+             {
+               console.log(d.source.device_info)
+                 return 200;
+             }
+             else if (d.source.device_info == 'ROADM')
+             {console.log(d.source.device_info)
+                return i + 10;
+             }else if (d.source.device_info == 'OVSBridge')
+             {console.log(d.source.device_info)
+                return i + 10;
+             }   
+             else {
+                 return 10;
+             }
             }),
           charge_frc = d3
             .forceManyBody()
             .strength((d: any) => {
-              // if ("id" in d) {
-                 return -3600;
-              // } else {
-              //   return -20;
-              // }
+              console.log(d)
+              if (d.device_info == 'Host') 
+             {
+               console.log(d.device_info)
+                 return 200;
+             }
+             else if (d.device_info == 'ROADM')
+             {console.log(d.device_info)
+                return  -1000;
+             }else if (d.device_info == 'OVSBridge')
+             {console.log(d.device_info)
+                return 10;
+             }   
+             else {
+                 return 10;
+             }
             })
             .distanceMax(300),
           center_frc = d3.forceCenter();
@@ -657,18 +676,18 @@ import {
       this.render(simulation);
     }
     do_tick(link_sel : any, node_sel: any, desc_sel: any) {
-
       /*
           update visualization of links
               path
       */
-      link_sel.select('path.link_item').attr("d", function(d: any) {
+      link_sel.select('path.link_item').attr("d", (d: any) => {
+        console.log(d)
           return "M" + d['source'].x + "," + d['source'].y
               + "S" + d['intermediate'].x + "," + d['intermediate'].y
               + " " + d['target'].x + "," + d['target'].y;
       });
 
-      link_sel.select('path.link_selector').attr("d", function(d: any) {
+      link_sel.select('path.link_selector').attr("d", (d: any) => {
           return "M" + d['source'].x + "," + d['source'].y
               + "S" + d['intermediate'].x + "," + d['intermediate'].y
               + " " + d['target'].x + "," + d['target'].y;
@@ -679,7 +698,7 @@ import {
           update visualization of nodes
               g <- text
       */
-      node_sel.attr('transform', function(d: any) {
+      node_sel.attr('transform', (d: any) => {
           return 'translate(' + d.x + ',' + d.y + ')';
       });
 
@@ -688,7 +707,7 @@ import {
           update visualization of description
               g<-text
       */
-      desc_sel.attr('transform', function(d: any) {
+      desc_sel.attr('transform', (d: any) => {
           return 'translate(' + d.x + ',' + d.y + ')';
       });
 
@@ -701,63 +720,7 @@ import {
       //                    .selectAll('circle');
       // inter_node.attr('cx', function(d) { return d.x; })
       //           .attr('cy', function(d) { return d.y; });
-  }
-  // do_ticks(link_sel : any, node_sel, desc_sel){
-  //     /*
-  //           update visualization of links
-  //               path
-  //       */
-  //     link_sel.select("path.link_item").attr("d", function (d: any) {
-  //       return (
-  //         "M" +
-  //         d["source"].x +
-  //         "," +
-  //         d["source"].y +
-  //         "S" +
-  //         d["intermediate"].x +
-  //         "," +
-  //         d["intermediate"].y +
-  //         " " +
-  //         d["target"].x +
-  //         "," +
-  //         d["target"].y
-  //       );
-  //     });
-  
-  //     link_sel.select("path.link_selector").attr("d", function (d: any) {
-  //       return (
-  //         "M" +
-  //         d["source"].x +
-  //         "," +
-  //         d["source"].y +
-  //         "S" +
-  //         d["intermediate"].x +
-  //         "," +
-  //         d["intermediate"].y +
-  //         " " +
-  //         d["target"].x +
-  //         "," +
-  //         d["target"].y
-  //       );
-  //     });
-  
-  //     /*
-  //           update visualization of nodes
-  //               g <- text
-  //       */
-  //     node_sel.attr("transform", function (d: { x: string; y: string }) {
-  //       return "translate(" + d.x + "," + d.y + ")";
-  //     });
-  
-  //     /*
-  //           update visualization of description
-  //               g<-text
-  //       */
-  //     desc_sel.attr("transform", function (d: { x: string; y: string }) {
-  //       return "translate(" + d.x + "," + d.y + ")";
-  //     });
-  
-  //   }
+    }
   
     do_one_tick() {
       /*
