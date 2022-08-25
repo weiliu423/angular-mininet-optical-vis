@@ -23,7 +23,7 @@ import {
     messagingSenderId: "752741188254",
     appId: "1:752741188254:web:b113a9ec279d157325b18f"
   };
-
+  initializeApp(firebaseConfig);
   @Component({
     selector: "app-d3-vis",
     templateUrl: "./d3-vis.component.html",
@@ -38,13 +38,6 @@ import {
     constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private notifierService: NotifierService) {
       this.networkData = new topo([], []);
       this.notifier = notifierService;
-      // Initialize Firebase
-      try{
-        initializeApp(firebaseConfig);
-      }catch(err)
-      {
-        console.log(err)
-      }
     }
     /////////////////////////////////////////////////////////////////
     public bntStyle : string = "btn btn-xl btn-danger disabled";
@@ -66,6 +59,7 @@ import {
     ngOnInit(): void {
       console.log(this.isRendered)
       this.createOnline$().subscribe(isOnline => this.isNetworkOnline = isOnline);
+      console.log(this.isNetworkOnline)
       if(this.isNetworkOnline)
       {
         this.firebaseGetDataFile();
@@ -81,6 +75,7 @@ import {
     public topo: any; // keep track of topo.
     public animated: boolean = false; // animated or static
     public svg: any;
+    public color: any;
     public src_node: any;
     public dst_node: any;
     public simulation: any;
@@ -89,7 +84,9 @@ import {
     public targetPort: any;
     public target: any;
     public portStatus: any;
+
     initialize_topo() {
+      this.color = d3.scaleOrdinal(d3.schemeCategory20);
       /*
             create container for links and nodes elements.
         */
@@ -133,24 +130,25 @@ import {
               return d.id;
             })
             .distance(function (d: any, i : any) {
-              // if ("id" in d.source 
-              // //&& "id" in d.target
-              // ) {
-                return i==4 ? 2000 : -500;
-              // } else {
-              //   return 60;
-              // }
+              //console.log(d.source)
+               if (d.source.device_info == 'Host' 
+             // && "id" in d.target
+             ) {
+                 return 1100;
+             } else {
+                 return 60;
+            }
             }),
           charge_frc = d3
             .forceManyBody()
             .strength((d: any) => {
-              if ("id" in d) {
-                return -150;
-              } else {
-                return -50;
-              }
+              // if ("id" in d) {
+                 return -3600;
+              // } else {
+              //   return -20;
+              // }
             })
-            .distanceMax(200),
+            .distanceMax(300),
           center_frc = d3.forceCenter();
   
         /*
@@ -216,6 +214,9 @@ import {
               "</p>" +
               "<p><strong class='title'>Pid:</strong>" +
               d.pid +
+              "</p>"+ 
+              "<p><strong class='title'>Device Info:</strong>" +
+              d.device_info +
               "</p>"
              
             );
@@ -229,11 +230,11 @@ import {
 
         if (this.animated) {
           this.simulation
-            //.force("link", link_frc)
-            //.force("center", center_frc)
-            //.force("charge", charge_frc);
+          //.force("link", link_frc)
+          //.force("center", center_frc)
+          //.force("charge", charge_frc);
         }
-  
+   
         // keep track of topo components.
         this.topo = {
           simulation: this.simulation,
@@ -268,7 +269,7 @@ import {
       d3.json(this.dataJsonUrl, (graph: any) => {
       // console.log(JSON.stringify(this.network));
       // d3.json(JSON.stringify(this.network), (graph: any) => {
-        console.log(JSON.stringify(graph));
+        //console.log(JSON.stringify(graph));
         graph = graph["topo"];
         // let links = [];
   
@@ -314,7 +315,11 @@ import {
           .selectAll("g.link_container")
           .data(bilinks);
         link.exit().remove();
-        let new_link = link.enter().append("g").classed("link_container", true);
+        let new_link = link.enter().append("g").classed("link_container", true)
+
+        // .attr("fill", (d : any) => {
+        //   console.log(d)
+        //   return this.color(d.source_port_disp);});
   
         new_link.append("path").classed("link_item", true);
   
@@ -568,9 +573,8 @@ import {
   
       let width = +svg.style("width").replace("px", ""),
         height = +svg.style("height").replace("px", "");
-  
       center_frc.x(width / 2).y(height / 2);
-  
+
       if (this.animated) {
         this.do_animated_layout();
       } else {
@@ -641,6 +645,7 @@ import {
         center_frc = this.topo["center_force"],
         charge_frc = this.topo["charge_force"],
         link_frc = this.topo["link_force"];
+
       if (!this.animated) {
        simulation
           .force("center", center_frc)
@@ -648,88 +653,111 @@ import {
           .force("link", link_frc);
       }
       simulation.alpha(1);
-  
-      window.requestAnimationFrame(() => this.render(simulation));
+
+      this.render(simulation);
     }
-  
-    do_tick(
-      link_sel: {
-        select: (arg0: string) => {
-          (): any;
-          new (): any;
-          attr: {
-            (arg0: string, arg1: { (d: any): string; (d: any): string }): void;
-            new (): any;
-          };
-        };
-      },
-      node_sel: { attr: (arg0: string, arg1: (d: any) => string) => void },
-      desc_sel: { attr: (arg0: string, arg1: (d: any) => string) => void }
-    ) {
+    do_tick(link_sel : any, node_sel: any, desc_sel: any) {
+
       /*
-            update visualization of links
-                path
-        */
-      link_sel.select("path.link_item").attr("d", function (d: any) {
-        return (
-          "M" +
-          d["source"].x +
-          "," +
-          d["source"].y +
-          "S" +
-          d["intermediate"].x +
-          "," +
-          d["intermediate"].y +
-          " " +
-          d["target"].x +
-          "," +
-          d["target"].y
-        );
+          update visualization of links
+              path
+      */
+      link_sel.select('path.link_item').attr("d", function(d: any) {
+          return "M" + d['source'].x + "," + d['source'].y
+              + "S" + d['intermediate'].x + "," + d['intermediate'].y
+              + " " + d['target'].x + "," + d['target'].y;
       });
-  
-      link_sel.select("path.link_selector").attr("d", function (d: any) {
-        return (
-          "M" +
-          d["source"].x +
-          "," +
-          d["source"].y +
-          "S" +
-          d["intermediate"].x +
-          "," +
-          d["intermediate"].y +
-          " " +
-          d["target"].x +
-          "," +
-          d["target"].y
-        );
+
+      link_sel.select('path.link_selector').attr("d", function(d: any) {
+          return "M" + d['source'].x + "," + d['source'].y
+              + "S" + d['intermediate'].x + "," + d['intermediate'].y
+              + " " + d['target'].x + "," + d['target'].y;
       });
-  
+
+
       /*
-            update visualization of nodes
-                g <- text
-        */
-      node_sel.attr("transform", function (d: { x: string; y: string }) {
-        return "translate(" + d.x + "," + d.y + ")";
+          update visualization of nodes
+              g <- text
+      */
+      node_sel.attr('transform', function(d: any) {
+          return 'translate(' + d.x + ',' + d.y + ')';
       });
-  
+
+
       /*
-            update visualization of description
-                g<-text
-        */
-      desc_sel.attr("transform", function (d: { x: string; y: string }) {
-        return "translate(" + d.x + "," + d.y + ")";
+          update visualization of description
+              g<-text
+      */
+      desc_sel.attr('transform', function(d: any) {
+          return 'translate(' + d.x + ',' + d.y + ')';
       });
-  
+
       // /*
       //     debug: update intermediate nodes' position
       // */
-      // let d3 = D3.Default,
-      //     inter_node = d3.select(this.svgContainerRef.nativeElement)
+      // var d3 = D3.Default,
+      //     inter_node = d3.select('svg#topo_container')
       //                    .select('g.intermediate_nodes')
       //                    .selectAll('circle');
-      // inter_node.attr('cx', (d : any, i:any, n:any) => { return d.x; })
-      //           .attr('cy', (d : any, i:any, n:any) => { return d.y; });
-    }
+      // inter_node.attr('cx', function(d) { return d.x; })
+      //           .attr('cy', function(d) { return d.y; });
+  }
+  // do_ticks(link_sel : any, node_sel, desc_sel){
+  //     /*
+  //           update visualization of links
+  //               path
+  //       */
+  //     link_sel.select("path.link_item").attr("d", function (d: any) {
+  //       return (
+  //         "M" +
+  //         d["source"].x +
+  //         "," +
+  //         d["source"].y +
+  //         "S" +
+  //         d["intermediate"].x +
+  //         "," +
+  //         d["intermediate"].y +
+  //         " " +
+  //         d["target"].x +
+  //         "," +
+  //         d["target"].y
+  //       );
+  //     });
+  
+  //     link_sel.select("path.link_selector").attr("d", function (d: any) {
+  //       return (
+  //         "M" +
+  //         d["source"].x +
+  //         "," +
+  //         d["source"].y +
+  //         "S" +
+  //         d["intermediate"].x +
+  //         "," +
+  //         d["intermediate"].y +
+  //         " " +
+  //         d["target"].x +
+  //         "," +
+  //         d["target"].y
+  //       );
+  //     });
+  
+  //     /*
+  //           update visualization of nodes
+  //               g <- text
+  //       */
+  //     node_sel.attr("transform", function (d: { x: string; y: string }) {
+  //       return "translate(" + d.x + "," + d.y + ")";
+  //     });
+  
+  //     /*
+  //           update visualization of description
+  //               g<-text
+  //       */
+  //     desc_sel.attr("transform", function (d: { x: string; y: string }) {
+  //       return "translate(" + d.x + "," + d.y + ")";
+  //     });
+  
+  //   }
   
     do_one_tick() {
       /*
@@ -746,12 +774,12 @@ import {
     public ticks_per_render : number = 5;
     render(simulation: any) {
       for (let i = 0; i < 5; i++) {
-       simulation.tick;
+       simulation.tick();
       }
   
       this.do_one_tick();
   
-      if (simulation.alpha() > simulation.alphaMin()) {
+      if (simulation.alpha > simulation.alphaMin) {
         window.requestAnimationFrame(this.render);
       } else {
         if (!this.animated) {
@@ -804,7 +832,6 @@ import {
         console.log(url);
         this.nodeFileUrl = url;
         this.linkfileParse(); 
-        this.notifier.notify('success', 'Firebase server connected.');  
       })
       .catch((error) => {
         // Handle any errors
@@ -853,6 +880,9 @@ import {
           this.dataJsonUrl = url;
           this.initialize_topo();
           this.load();
+          this.firebaseStatus = "200 - Success";
+          this.firebaseStatusStyle = "text-success";
+          this.notifier.notify('success', 'Firebase server connected.');  
           return url;
         })
         .catch((error) => {
@@ -888,6 +918,7 @@ import {
     public preNodeProcess: boolean = false;
     public nodeFileUrl: string = "";
     public linkFileUrl: string = "";
+    public regexExp = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi;
     //###############################################################  
     loadNodeFile(event: any) {
       const file = event.target.files[0];
@@ -1039,7 +1070,6 @@ import {
       }
     }
 
-    public regexExp = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi;
     hostParse(host: string)
     {
       //parse host parameter and split by ':'
@@ -1060,7 +1090,7 @@ import {
             pid = element.split('=')[1];
           }
         });
-        this.addNode(source, ip, pid);
+        this.addNode(source, ip, pid, "Host");
       }
     }
 
@@ -1085,7 +1115,7 @@ import {
             pid = element.split('=')[1];
           }
         });
-        this.addNode(source, ip, pid);
+        this.addNode(source, ip, pid, "ROADM");
       }
     }
 
@@ -1110,7 +1140,7 @@ import {
             pid = element.split('=')[1];
           }
         });
-        this.addNode(source, ip, pid);
+        this.addNode(source, ip, pid, "OVSBridge");
       }
     }
 
@@ -1135,7 +1165,7 @@ import {
             pid = element.split('=')[1];
           }
         });
-        this.addNode(source, ip, pid);
+        this.addNode(source, ip, pid, "Terminal");
       }
     }
 
@@ -1144,7 +1174,7 @@ import {
 
     }
 
-    addNode(source: string, ip : string, pid : string)
+    addNode(source: string, ip : string, pid : string, deviceInfo : string)
     {
         let node = {
             id: source,
@@ -1152,6 +1182,7 @@ import {
             netmask: '255.255.255.0',
             ip: ip,
             pid: pid,
+            device_info: deviceInfo
         };
         //example of how to add a link to the graph
         //{"source": "s0", "target_port_disp": "port_1", "source_port_disp": "port_7", "target": "s4"}
@@ -1172,18 +1203,30 @@ import {
                   if(status.length > 0)
                   {                                 
                       line.split('<->').forEach((element, i) => {
+                          console.log(element, i)
                           element = element.replace(status[0], '');
-                          this.sourceName = element.split('-')[0];
-                          this.sourcePort = element.split('-')[1];
+                          let sourceName = element.split('-')[0].replace(' ', '');
+                          let sourcePort = element.split('-')[1].replace(' ', '');
+                          let targetName = "";
+                          let targetPort = "";
                           if(i == 0)
                           {
-                              this.target = line.split('<->')[i+1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
-                              this.targetPort = line.split('<->')[i+1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
+                              targetName = line.split('<->')[i+1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
+                              targetPort = line.split('<->')[i+1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
                           }else{
-                              this.target = line.split('<->')[i-1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
-                              this.targetPort = line.split('<->')[i-1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
+                              targetName = line.split('<->')[i-1].split('-')[0].replace(status[0], '').replace(/\s/g, "");
+                              targetPort = line.split('<->')[i-1].split('-')[1].replace(status[0], '').replace(/\s/g, "");
                           }
-                          this.addLink(this.sourceName, this.sourcePort, this.target, this.targetPort);
+
+                          let exist = this.linksArray.filter(f => f.source === targetName.replace(' ', '')
+                                                                  && f.target === sourceName.replace(' ', '')
+                                                                  && f.target_port_disp === sourcePort.replace(' ', '')
+                                                                  && f.source_port_disp === targetPort.replace(' ', ''));
+                          console.log(exist, targetName,sourceName,  sourcePort, )
+                          if(exist.length == 0)
+                          {
+                            this.addLink(sourceName.replace(' ', ''), sourcePort.replace(' ', ''), targetName.replace(' ', ''), targetPort.replace(' ', ''));
+                          }
                       });
                   }
                 }

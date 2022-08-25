@@ -18,6 +18,7 @@ export class nodes{
         public device_name:string,
         public id:string,
         public pid:string,
+        public device_info:string,
      ) {}
 }
 
