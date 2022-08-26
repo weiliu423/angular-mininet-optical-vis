@@ -526,6 +526,7 @@ import {
           
         new_node.append("image")
         .attr("xlink:href", (d: any) => {
+          console.log(d)
           if(d.device_info == "ROADM")
           {
             return "https://firebasestorage.googleapis.com/v0/b/mininet-optical-file-system.appspot.com/o/icon%2Fosa_device-wireless-router.png?alt=media&token=4e418f3c-eea4-4ba6-b83b-6c9618cd0910"

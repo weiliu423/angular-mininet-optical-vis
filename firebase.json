@@ -13,6 +13,6 @@
   "hosting": {
     "site": "mininet-optical-visualizer",
 
-    "public": "public"
+    "public": "dist"
   }
 }
