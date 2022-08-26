@@ -16868,8 +16868,6 @@ rect#view_container {
 
 
 .links .link_container .link_item{
-  stroke: #999;
-
   fill: none;
   stroke-width: 3px;
 }
@@ -16920,7 +16918,6 @@ rect#view_container {
 }
 
 .nodes .node_container.stat_down circle {
-  stroke: #adabab;
   fill: rgba(193, 193, 193, 0.67);
 }
 
@@ -16975,7 +16972,6 @@ rect#view_container {
 }
 
 .link {
-stroke: #aaa;
 stroke-width: 1.5px;
 }
 

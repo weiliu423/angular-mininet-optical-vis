@@ -73,11 +73,12 @@ import {
     public linksArray: links[] = [];
     public nodeArray: nodes[] = [];
     public topo: any; // keep track of topo.
-    public animated: boolean = false; // animated or static
+    public animated: boolean = true; // animated or static
     public svg: any;
     public color: any;
     public src_node: any;
     public dst_node: any;
+    public text: any;
     public simulation: any;
     public sourceName: any;
     public sourcePort : any;
@@ -124,8 +125,7 @@ import {
         /*
                 force
             */
-        let link_frc = d3
-            .forceLink()
+        let link_frc = d3.forceLink()
             .id((d: any) => {
               return d.id;
             })
@@ -133,43 +133,50 @@ import {
               //console.log(d.source)
              if (d.source.device_info == 'Host') 
              {
-               console.log(d.source.device_info)
                  return 200;
              }
              else if (d.source.device_info == 'ROADM')
-             {console.log(d.source.device_info)
-                return i + 10;
-             }else if (d.source.device_info == 'OVSBridge')
-             {console.log(d.source.device_info)
-                return i + 10;
-             }   
-             else {
-                 return 10;
-             }
-            }),
-          charge_frc = d3
-            .forceManyBody()
-            .strength((d: any) => {
-              console.log(d)
-              if (d.device_info == 'Host') 
              {
-               console.log(d.device_info)
+                return 10;
+             }
+             else if (d.source.device_info == 'OVSBridge')
+             {
+                return i + 10;
+             }  
+             else if (d.source.device_info == 'Terminal')
+             {
+              console.log(d.source.device_info)
+                return 100;
+             }  
+             else {
                  return 200;
              }
+            }),
+          charge_frc = d3.forceManyBody()
+            .strength((d: any) => {
+              if (d.device_info == 'Host') 
+             {
+               
+                 return -200;
+             }
              else if (d.device_info == 'ROADM')
-             {console.log(d.device_info)
-                return  -1000;
+             {
+                return  -20;
              }else if (d.device_info == 'OVSBridge')
-             {console.log(d.device_info)
-                return 10;
+             {           
+                return -100;
              }   
+             else if (d.device_info == 'Terminal')
+             {
+                console.log(d.device_info)
+                return -1100;
+             } 
              else {
-                 return 10;
+                 return -700;
              }
             })
-            .distanceMax(300),
+            .distanceMax(500),
           center_frc = d3.forceCenter();
-  
         /*
                 gestures.
             */
@@ -215,7 +222,7 @@ import {
             // inter_nodes.attr('transform', d3.event.transform);
           });
         this.svg.call(zoom);
-  
+   
         /*
                 tooltip
             */
@@ -266,6 +273,7 @@ import {
           link_source_tip: link_src_tip,
           link_dest_tip: link_dst_tip,
         };
+        console.log(this.topo)
       }
     }
   
@@ -335,10 +343,8 @@ import {
           .data(bilinks);
         link.exit().remove();
         let new_link = link.enter().append("g").classed("link_container", true)
-
-        // .attr("fill", (d : any) => {
-        //   console.log(d)
-        //   return this.color(d.source_port_disp);});
+        .attr("stroke", (d : any) => {
+          return this.color(d.source_port_disp);});
   
         new_link.append("path").classed("link_item", true);
   
@@ -485,6 +491,7 @@ import {
               return "id" in d;
             })
           );
+
         node.exit().remove();
         let new_node = node
           .enter()
@@ -500,17 +507,62 @@ import {
             d3.select(n[i]).classed("focus", false);
             return node_tip.hide.apply(this, n[i]);
           })
-          .call(drag);
-  
-        new_node.append("circle").attr("r", 20);
-  
+          .call(drag)
+          .attr("stroke", (d : any) => {
+            if(d.device_info == "ROADM")
+            {
+              return "#FF0000"
+            }
+            else if(d.device_info == "Terminal")
+            {
+              return "#0080FC"
+            }
+            else{
+              return this.color(d.source)
+            }            
+          });
+          
+        //new_node.append("circle").attr("r", 30);
+          
+        new_node.append("image")
+        .attr("xlink:href", (d: any) => {
+          if(d.device_info == "ROADM")
+          {
+            return "https://firebasestorage.googleapis.com/v0/b/mininet-optical-file-system.appspot.com/o/icon%2Fosa_device-wireless-router.png?alt=media&token=4e418f3c-eea4-4ba6-b83b-6c9618cd0910"
+          }
+          else if(d.device_info == "Terminal")
+          {
+            return "https://firebasestorage.googleapis.com/v0/b/mininet-optical-file-system.appspot.com/o/icon%2Fosa_vpn.png?alt=media&token=b3917ec2-4a0f-4171-9d5f-c0931f185b25"
+          }else{
+            return "https://github.com/favicon.ico"
+          }
+          
+        })
+        .attr("x", -30)
+        .attr("y", -30)
+        .attr("width", 60)
+        .attr("height", 60);
+        // new_node
+        //   .append("text")
+        //   .attr("x", 0)
+        //   .attr("y", 12)
+        //   .classed("ftstcall", true)
+        //   .text((d :any) =>{
+        //     return d.device_name;
+        //   });
         new_node
           .append("text")
+          .style("fill", "black")
+          .text((d :any) =>{
+            return String(d.device_name).toUpperCase();
+          }).enter();
+
+          this.text = this.svg.selectAll('text')
           .attr("x", 0)
-          .attr("y", 12)
-          .classed("ftstcall", true)
-          .text("\ueaf2");
-  
+          .attr("y", -20)
+          .data(new_node);
+          //.enter();
+
         node = new_node.merge(node);
         node.attr("class", (d: any) => {
           let stat_cls;
@@ -624,7 +676,7 @@ import {
           .force("charge", charge_frc)
           .force("link", link_frc);
       }
-      simulation.alpha(1);
+      simulation.alpha(1).restart();
   
       for (
         let i = 0,
@@ -665,13 +717,16 @@ import {
         charge_frc = this.topo["charge_force"],
         link_frc = this.topo["link_force"];
 
-      if (!this.animated) {
+      if (this.animated) {
        simulation
           .force("center", center_frc)
           .force("charge", charge_frc)
-          .force("link", link_frc);
+          .force("link", link_frc)
+          .force("collide", d3.forceCollide((d : any) => {
+            return d.r + 1;
+          }));
       }
-      simulation.alpha(1);
+      simulation.alpha(1).restart();
 
       this.render(simulation);
     }
@@ -680,12 +735,17 @@ import {
           update visualization of links
               path
       */
-      link_sel.select('path.link_item').attr("d", (d: any) => {
-        console.log(d)
-          return "M" + d['source'].x + "," + d['source'].y
-              + "S" + d['intermediate'].x + "," + d['intermediate'].y
-              + " " + d['target'].x + "," + d['target'].y;
+      this.text.attr("text", (d: any) => {
+        return "M" + d['source'].x + "," + d['source'].y
+            + "S" + d['intermediate'].x + "," + d['intermediate'].y
+            + " " + d['target'].x + "," + d['target'].y;
       });
+            
+      link_sel.select('path.link_item').attr("d", (d: any) => {
+        return "M" + d['source'].x + "," + d['source'].y
+            + "S" + d['intermediate'].x + "," + d['intermediate'].y
+            + " " + d['target'].x + "," + d['target'].y;
+    });
 
       link_sel.select('path.link_selector').attr("d", (d: any) => {
           return "M" + d['source'].x + "," + d['source'].y
@@ -702,7 +762,6 @@ import {
           return 'translate(' + d.x + ',' + d.y + ')';
       });
 
-
       /*
           update visualization of description
               g<-text
@@ -710,16 +769,6 @@ import {
       desc_sel.attr('transform', (d: any) => {
           return 'translate(' + d.x + ',' + d.y + ')';
       });
-
-      // /*
-      //     debug: update intermediate nodes' position
-      // */
-      // var d3 = D3.Default,
-      //     inter_node = d3.select('svg#topo_container')
-      //                    .select('g.intermediate_nodes')
-      //                    .selectAll('circle');
-      // inter_node.attr('cx', function(d) { return d.x; })
-      //           .attr('cy', function(d) { return d.y; });
     }
   
     do_one_tick() {
@@ -853,7 +902,7 @@ import {
           console.log(error)
           this.firebaseStatus = "500 - Internal Error";
           this.firebaseStatusStyle = "text-danger";
-          this.notifier.notify('error', 'Not able to connect to server!'); 
+          this.notifier.notify('error', 'An error occurred!'); 
         });
         //return this.dataJsonUrl;
       }catch(e)
@@ -1194,7 +1243,6 @@ import {
                   }
                 }
             }
-            console.log(this.linksArray)
             this.networkData.links = this.linksArray;
             this.preLinkProcess = true;
             this.nodefileParse(); 
@@ -1240,7 +1288,6 @@ import {
             target: target,
             target_port_disp: targetPortName,
             source_port_disp: sourcePortName
-
         }
         //example of how to add a link to the graph
         //{"source": "s0", "target_port_disp": "port_1", "source_port_disp": "port_7", "target": "s4"}
