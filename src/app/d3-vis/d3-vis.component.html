@@ -13,7 +13,6 @@
         <input #linkSelection id="link" type="file" class="filestyle btn btn-primary" (change)="loadLinkFile($event)" /> &nbsp; 
       </div>
     </div>
-    <br>
     <div class="row">
       <div class="col-md-12">
         <button [ngClass]="[bntStyle]" (click)="confirmLoad()">Load files</button>
@@ -22,28 +21,39 @@
   </div>
   
   <div class="col-md-6 ">
-    <table class="table table-bordered">
-      <tbody class="">
-        <tr class="table-active">
-          <th scope="row detailText">Firebase Status</th>
-          <td [ngClass]="[firebaseStatusStyle]">
-            {{firebaseStatus}}
-          </td>
-        </tr>
-        <tr>
-          <th scope="row detailText">Local File Status</th>
-          <td [ngClass]="[loadFileStatuStyle]">
-            {{loadFileStatus}}
-          </td>
-        </tr>
-        <tr class="table-active">
-          <th scope="row detailText">API Status</th>
-          <td [ngClass]="[apiStatusStyle]">
-            {{apiStatus}}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="row">
+        <div class="col-md-6">
+          <label><b>OSNR File:</b> &nbsp;&nbsp;&nbsp;</label>
+          <input id="osnr" type="file" class="filestyle btn btn-primary" (change)="loadOSNRFile($event)" /> &nbsp; 
+          <div class="col-md-12">
+            <button class="btn btn-success btn-xl" (click)="confirmOSNRUpdate()">Load OSNR file</button>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <table class="table table-bordered">
+            <tbody class="">
+              <tr class="table-active">
+                <th scope="row detailText">Firebase Status</th>
+                <td [ngClass]="[firebaseStatusStyle]">
+                  {{firebaseStatus}}
+                </td>
+              </tr>
+              <tr>
+                <th scope="row detailText">Local File Status</th>
+                <td [ngClass]="[loadFileStatuStyle]">
+                  {{loadFileStatus}}
+                </td>
+              </tr>
+              <tr class="table-active">
+                <th scope="row detailText">API Status</th>
+                <td [ngClass]="[apiStatusStyle]">
+                  {{apiStatus}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+    </div>
   </div>
 </div>
 <hr>

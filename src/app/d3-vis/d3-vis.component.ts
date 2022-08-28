@@ -14,6 +14,8 @@ import {
   import {  getStorage, ref, getDownloadURL, uploadString } from "firebase/storage";
   import { initializeApp } from "firebase/app";
   import { NotifierService } from 'angular-notifier';
+  import { PythonApiService } from "../services/python-api.service";
+import { file_upload } from "../models/osnr_mapping.model";
   //Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCeRkrVepStRHHP-5WuMgJ80f3hIfTLn_0",
@@ -34,8 +36,10 @@ import {
     public isRendered = false;
     public isNetworkOnline = false;
     private readonly notifier: NotifierService;
+    public width: any;
+    public height: any;
 
-    constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private notifierService: NotifierService) {
+    constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private notifierService: NotifierService, private apiService: PythonApiService) {
       this.networkData = new topo([], []);
       this.notifier = notifierService;
     }
@@ -43,7 +47,7 @@ import {
     public bntStyle : string = "btn btn-xl btn-danger disabled";
     public firebaseStatus : string = "500 - Internal Error";
     public loadFileStatus : string = "404 - Not Found";
-    public apiStatus : string = "500 - Internal Error";
+    public apiStatus : string = "404 - Not Found";
     public firebaseStatusStyle : string = "text-danger";
     public loadFileStatuStyle : string = "text-danger";
     public apiStatusStyle : string = "text-danger";
@@ -63,6 +67,25 @@ import {
       if(this.isNetworkOnline)
       {
         this.firebaseGetDataFile();
+      }
+      try{
+        let getOSNR: any;
+        getOSNR = this.apiService.getOSNRData();
+        getOSNR.subscribe((resp : any) => {
+          console.log(resp)
+          if (resp.data?.length > 0) {
+            this.apiStatus = "200 - Success";
+            this.apiStatusStyle = "text-success";
+            this.notifierService.notify("success", "API online.");
+          }
+          if(resp.error != null)
+          {
+            this.notifierService.notify("error", "Failed to load API.");
+          }
+        });
+      }catch(e)
+      {
+        this.notifierService.notify("error", "Error occurred on API.");
       }
     }
 
@@ -92,7 +115,8 @@ import {
             create container for links and nodes elements.
         */
       this.svg = d3.select(this.svgContainerRef.nativeElement);
-  
+      this.width = this.svg.style("width").replace("px", "");
+      this.height = this.svg.style("height").replace("px", "");
       let links = this.svg.select("g.links");
       if (!links.size()) {
         links = this.svg.append("g").attr("class", "links");
@@ -121,7 +145,7 @@ import {
                 force simulation
             */
         this.simulation = d3.forceSimulation().stop();
-  
+        console.log(this.height)
         /*
                 force
             */
@@ -133,23 +157,23 @@ import {
               //console.log(d.source)
              if (d.source.device_info == 'Host') 
              {
-                 return 200;
+                 return 60;
              }
              else if (d.source.device_info == 'ROADM')
              {
-                return 10;
+                return -70;
              }
              else if (d.source.device_info == 'OVSBridge')
              {
-                return i + 10;
+                return 100;
              }  
              else if (d.source.device_info == 'Terminal')
              {
-              console.log(d.source.device_info)
-                return 100;
+                return 200;
              }  
              else {
-                 return 200;
+              //expand link on increase
+                 return 100;
              }
             }),
           charge_frc = d3.forceManyBody()
@@ -161,7 +185,7 @@ import {
              }
              else if (d.device_info == 'ROADM')
              {
-                return  -20;
+                return  -2700;
              }else if (d.device_info == 'OVSBridge')
              {           
                 return -100;
@@ -175,7 +199,7 @@ import {
                  return -700;
              }
             })
-            .distanceMax(500),
+            .distanceMax(this.height/2),
           center_frc = d3.forceCenter();
         /*
                 gestures.
@@ -186,7 +210,7 @@ import {
           .drag()
           .on("start", (d: any) => {
             if (!d3.event.active) {
-              this.simulation.alphaTarget(0.3).restart();
+              this.simulation.alphaTarget(0.6).restart();
             }
   
             d.fx = d.x;
@@ -496,7 +520,8 @@ import {
         let new_node = node
           .enter()
           .append("g")
-          .on("click", () => {
+          .on("click", (d:any) => {
+            return console.log("test", d)
           })
           .on("mouseover", (d: any, i: any, n: any) => {
             this.selData = d;
@@ -526,7 +551,6 @@ import {
           
         new_node.append("image")
         .attr("xlink:href", (d: any) => {
-          console.log(d)
           if(d.device_info == "ROADM")
           {
             return "https://firebasestorage.googleapis.com/v0/b/mininet-optical-file-system.appspot.com/o/icon%2Fosa_device-wireless-router.png?alt=media&token=4e418f3c-eea4-4ba6-b83b-6c9618cd0910"
@@ -534,7 +558,15 @@ import {
           else if(d.device_info == "Terminal")
           {
             return "https://firebasestorage.googleapis.com/v0/b/mininet-optical-file-system.appspot.com/o/icon%2Fosa_vpn.png?alt=media&token=b3917ec2-4a0f-4171-9d5f-c0931f185b25"
-          }else{
+          }
+          else if (d.device_info == "OVSBridge")
+          {
+            return "https://firebasestorage.googleapis.com/v0/b/mininet-optical-file-system.appspot.com/o/icon%2Fnetwork-switch-icon-20.jpg?alt=media&token=34b59c5c-6333-41a4-a4c9-6c75e822e2b6"
+          }
+          else if (d.device_info == "Host"){
+            return "https://firebasestorage.googleapis.com/v0/b/mininet-optical-file-system.appspot.com/o/icon%2Fosa_desktop_imac.png?alt=media&token=561b1231-a756-4a22-b268-45c7f9558740"
+          }
+          else{
             return "https://github.com/favicon.ico"
           }
           
@@ -560,7 +592,7 @@ import {
 
           this.text = this.svg.selectAll('text')
           .attr("x", 0)
-          .attr("y", -20)
+          .attr("y", -25)
           .data(new_node);
           //.enter();
 
@@ -643,9 +675,9 @@ import {
       let svg = d3.select(this.svgContainerRef.nativeElement),
         center_frc = this.topo["center_force"];
   
-      let width = +svg.style("width").replace("px", ""),
-        height = +svg.style("height").replace("px", "");
-      center_frc.x(width / 2).y(height / 2);
+      this.width = +svg.style("width").replace("px", "");
+      this.height = +svg.style("height").replace("px", "");
+      center_frc.x(this.width / 2).y(this.height / 2);
 
       if (this.animated) {
         this.do_animated_layout();
@@ -725,12 +757,13 @@ import {
           .force("link", link_frc)
           .force("collide", d3.forceCollide((d : any) => {
             return d.r + 1;
-          }));
+          }).iterations(10));
       }
-      simulation.alpha(1).restart();
+      simulation.alpha(0.5).restart();
 
       this.render(simulation);
     }
+
     do_tick(link_sel : any, node_sel: any, desc_sel: any) {
       /*
           update visualization of links
@@ -932,6 +965,8 @@ import {
     public nodeFileUrl: string = "";
     public linkFileUrl: string = "";
     public regexExp = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi;
+    public osnr_base64: string = "";
+    public file_upload_data: file_upload | undefined;
     //###############################################################  
     loadNodeFile(event: any) {
       const file = event.target.files[0];
@@ -965,6 +1000,7 @@ import {
       {
         const reader = new FileReader();
         reader.onload = (e: any) => {
+          console.log('content', e.target.result);
           const text = atob(e.target.result.split(",")[1]);
           this.linkFileString = text;
         };
@@ -983,6 +1019,24 @@ import {
         this.linkFileString = "";
       }
     }
+    loadOSNRFile(event: any) {
+      const file = event.target.files[0];
+      console.log('type', file.type);
+      if(file.type == "text/plain")
+      {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          console.log('content', e.target.result);
+          const text = e.target.result.split(",")[1];
+          this.osnr_base64 = text;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+        this.notifier.notify('success', 'OSNR file added.');  
+      }
+      else{
+        alert('Please choose the correct .txt file');
+      }
+    }
     confirmLoad()
     {
       if(this.nodeFileString != "" && this.linkFileString != "")
@@ -997,6 +1051,35 @@ import {
       }else{
         alert('Please load node and link file');
         this.loadFileStatuStyle = "text-danger"
+      }
+    }
+    confirmOSNRUpdate()
+    {
+      if(this.osnr_base64 != "")
+      {
+        try{
+          this.file_upload_data = {
+            data : '',
+            base64 : this.osnr_base64
+          };
+          let updateOSNR: any;
+          updateOSNR = this.apiService.uploadOSNRData(this.file_upload_data);
+          updateOSNR.subscribe((resp : any) => {
+            console.log(resp)
+            if (resp.data?.length > 0) {
+              this.notifierService.notify("success", "OSNR successfully updated");
+            }
+            if(resp.error != null)
+            {
+              this.notifierService.notify("error", "Failed to update OSNR file.");
+            }
+          });
+        }catch(e)
+        {
+          this.notifierService.notify("error", "Error occurred on API.");
+        }
+      }else{
+        alert('Please load OSNR text file');
       }
     }
     nodefileParse()
