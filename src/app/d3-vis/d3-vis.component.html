@@ -58,6 +58,18 @@
 </div>
 <hr>
 <app-dialog></app-dialog>
+<span class="">
+  <ul>
+    <h5>Channels:</h5>
+    <li *ngFor="let subtask of task.subtasks">
+      <mat-checkbox [(ngModel)]="subtask.completed"
+                    [color]="subtask.color"
+                    (ngModelChange)="updateAllComplete()">
+        {{subtask.name}}
+      </mat-checkbox>
+    </li>
+  </ul>
+</span>
 <svg #topo_container class="topo_container" width="960" height="600">
   <rect id="view_container" class="topo_container"></rect>
 </svg>

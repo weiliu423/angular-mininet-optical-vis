@@ -39,4 +39,13 @@ export class PythonApiService {
       );
   }
 
+  getSigTraceData() : Observable<[]> {
+    return this.http.get<[]>(`${this.api}sigtrace`, {
+        headers: new HttpHeaders().set('Access-Control-Allow-Origin', '*')})
+      .pipe(
+        take(1),
+        catchError(err => of(err))
+      );
+  }
+
 }

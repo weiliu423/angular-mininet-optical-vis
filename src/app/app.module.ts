@@ -1,6 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NetworkTopologyComponent } from './network-topology/network-topology.component';
@@ -75,7 +75,9 @@ const customNotifierOptions: NotifierOptions = {
     AngularFirestoreModule,
     NotifierModule.withConfig(customNotifierOptions),
     MaterialExampleModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ReactiveFormsModule,
+    FormsModule
   ],
   providers: [HttpClientModule],
   bootstrap: [AppComponent ],

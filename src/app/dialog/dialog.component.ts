@@ -19,7 +19,6 @@ export class DialogComponent {
   constructor(public dialog: MatDialog) {}
 
   openDialog(title:string, data: any): void {
-    console.log(data)
     const dialogRef =  this.dialog.open(DialogData, {
       data : {data, title}
     });
@@ -51,7 +50,6 @@ export class DialogData {
   title!: string;
   ngOnInit() {
     this.title = this.data.title;
-    console.log(this.data)
     if(this.data.data === undefined)
     {
       console.log(this.no_data_resp)
@@ -60,13 +58,10 @@ export class DialogData {
       const obj = JSON.parse(this.data.data.toString());
       this.rows = Object.values(obj);
       this.rows.forEach((element:any, index: any) => {
-        console.log(element, index)
         let dictKey = Object.values(element);
-        console.log(dictKey)
         dictKey.forEach((keys:any) =>{
           this.subKeys = Object.keys(keys)
           this.subKeys = this.subKeys.map((x : any) => { return x.toUpperCase(); })
-          console.log(this.subKeys)
           return
         })
       })
@@ -74,7 +69,6 @@ export class DialogData {
         //this.data_row
         this.data_row_value = []
         let value = this.rows[0][key];
-        console.log(value)
         this.data_row_value.push(key)
         for(let data_value in value)
         {
