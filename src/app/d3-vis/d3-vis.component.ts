@@ -38,6 +38,7 @@ import { file_upload } from "../models/osnr_mapping.model";
     private readonly notifier: NotifierService;
     public width: any;
     public height: any;
+    public enableSideView: any = false;
 
     constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private notifierService: NotifierService, private apiService: PythonApiService) {
       this.networkData = new topo([], []);
@@ -928,7 +929,7 @@ import { file_upload } from "../models/osnr_mapping.model";
           this.load();
           this.firebaseStatus = "200 - Success";
           this.firebaseStatusStyle = "text-success";
-          this.notifier.notify('success', 'Firebase server connected.');  
+          this.notifier.notify('success', 'Firebase server online.');  
           return url;
         })
         .catch((error) => {
