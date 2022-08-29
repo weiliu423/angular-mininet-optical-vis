@@ -12,6 +12,9 @@ import { environment } from 'src/environments/environment';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { NotifierModule, NotifierOptions } from 'angular-notifier';
+import { DialogComponent, DialogData } from './dialog/dialog.component';
+import { MaterialExampleModule } from './material.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; 
 
 const customNotifierOptions: NotifierOptions = {
   position: {
@@ -60,7 +63,9 @@ const customNotifierOptions: NotifierOptions = {
     NetworkTopologyComponent,
     SigmaVisComponent,
     D3VisComponent,
-    D3NetworkComponent
+    D3NetworkComponent,
+    DialogComponent,
+    DialogData
   ],
   imports: [
     BrowserModule,
@@ -69,9 +74,11 @@ const customNotifierOptions: NotifierOptions = {
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     NotifierModule.withConfig(customNotifierOptions),
+    MaterialExampleModule,
+    BrowserAnimationsModule
   ],
   providers: [HttpClientModule],
-  bootstrap: [AppComponent],
+  bootstrap: [AppComponent ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AppModule { }

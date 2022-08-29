@@ -29,4 +29,14 @@ export class PythonApiService {
         catchError(err => of(err))
       );
   }
+
+  getMonitorData() : Observable<[]> {
+    return this.http.get<[]>(`${this.api}monitors`, {
+        headers: new HttpHeaders().set('Access-Control-Allow-Origin', '*')})
+      .pipe(
+        take(1),
+        catchError(err => of(err))
+      );
+  }
+
 }

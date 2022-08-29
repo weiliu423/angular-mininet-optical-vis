@@ -15,21 +15,17 @@ export interface DialogData {
     styleUrls: ['./dialog.component.css']
 })
 export class DialogComponent {
-  animal!: string;
-  name!: string;
 
   constructor(public dialog: MatDialog) {}
 
-  openDialog(): void {
+  openDialog(title:string, data: any): void {
+    console.log(data)
     const dialogRef =  this.dialog.open(DialogData, {
-      data: {
-        animal: 'panda',
-      },
+      data : {data, title}
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
-      this.animal = result;
     });
   }
 }
@@ -37,13 +33,58 @@ export class DialogComponent {
 @Component({
   selector: 'dialog-data',
   templateUrl: './dialog-data.component.html',
+  styleUrls: ['./dialog.component.css']
 })
 export class DialogData {
   constructor(
     public dialogRef: MatDialogRef<DialogData>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {}
-
+  ) {
+    dialogRef.disableClose = true;
+  }
+  public rows: any;
+  public mainKey : any;
+  public subKeys: any;
+  public data_row: any = [];
+  public data_row_value: any = [];
+  public no_data_resp: string = "NO DATA FOUND!"
+  title!: string;
+  ngOnInit() {
+    this.title = this.data.title;
+    console.log(this.data)
+    if(this.data.data === undefined)
+    {
+      console.log(this.no_data_resp)
+    }
+    else{
+      const obj = JSON.parse(this.data.data.toString());
+      this.rows = Object.values(obj);
+      this.rows.forEach((element:any, index: any) => {
+        console.log(element, index)
+        let dictKey = Object.values(element);
+        console.log(dictKey)
+        dictKey.forEach((keys:any) =>{
+          this.subKeys = Object.keys(keys)
+          this.subKeys = this.subKeys.map((x : any) => { return x.toUpperCase(); })
+          console.log(this.subKeys)
+          return
+        })
+      })
+      for (let key in this.rows[0]) {
+        //this.data_row
+        this.data_row_value = []
+        let value = this.rows[0][key];
+        console.log(value)
+        this.data_row_value.push(key)
+        for(let data_value in value)
+        {
+          let data_values = value[data_value]
+          this.data_row_value.push(data_values)
+        }
+        this.data_row.push(this.data_row_value)    
+      }
+    }
+  }
   onNoClick(): void {
     this.dialogRef.close();
   }

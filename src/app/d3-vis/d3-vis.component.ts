@@ -16,6 +16,7 @@ import {
   import { NotifierService } from 'angular-notifier';
   import { PythonApiService } from "../services/python-api.service";
 import { file_upload } from "../models/osnr_mapping.model";
+import { DialogComponent } from "../dialog/dialog.component";
   //Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCeRkrVepStRHHP-5WuMgJ80f3hIfTLn_0",
@@ -39,6 +40,8 @@ import { file_upload } from "../models/osnr_mapping.model";
     public width: any;
     public height: any;
     public enableSideView: any = false;
+    public monitorData: any;
+    @ViewChild(DialogComponent) dialog!: DialogComponent;
 
     constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private notifierService: NotifierService, private apiService: PythonApiService) {
       this.networkData = new topo([], []);
@@ -82,6 +85,19 @@ import { file_upload } from "../models/osnr_mapping.model";
           if(resp.error != null)
           {
             this.notifierService.notify("error", "Failed to load API.");
+          }
+        });
+
+        let getMonitorData: any;
+        getMonitorData = this.apiService.getMonitorData();
+        getMonitorData.subscribe((resp : any) => {
+          //this.monitorData = resp.data;
+          if (resp.data != null) {
+            this.monitorData = resp.data;
+          }
+          if(resp.error != null)
+          {
+            this.notifierService.notify("error", "Failed to get monitor data.");
           }
         });
       }catch(e)
@@ -258,12 +274,15 @@ import { file_upload } from "../models/osnr_mapping.model";
             d = this.selData;
             return (   
               "<p><strong class='title'>Name:</strong>" +
-              d.device_name +
+              d.device_name.toUpperCase() +
               "</p>" +      
               "<p><strong class='title'>IP:</strong>" +
               d.ip +
               "</p>" +
-              "<p><strong class='title'>Pid:</strong>" +
+              "<p><strong class='title'>Netmask:</strong>" +
+              d.netmask +
+              "</p>" +
+              "<p><strong class='title'>PID:</strong>" +
               d.pid +
               "</p>"+ 
               "<p><strong class='title'>Device Info:</strong>" +
@@ -376,6 +395,9 @@ import { file_upload } from "../models/osnr_mapping.model";
         new_link
           .append("path")
           .classed("link_selector", true)
+          .on("click", (d:any) => {
+            return console.log("link", d)
+          })
           .on("mouseover", (d: any, i: any, n: any) => {
             /*
                             focus on target link
@@ -522,7 +544,9 @@ import { file_upload } from "../models/osnr_mapping.model";
           .enter()
           .append("g")
           .on("click", (d:any) => {
-            return console.log("test", d)
+            //console.log(this.monitorData[d.id + '_monitor'])
+            this.dialog.openDialog(d.id.toUpperCase(), this.monitorData[d.id + '_monitor']);
+            return console.log("node", d)
           })
           .on("mouseover", (d: any, i: any, n: any) => {
             this.selData = d;
