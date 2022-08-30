@@ -918,7 +918,8 @@ export class D3VisComponent implements OnInit {
   //#region Helper Methods
   public subtask!: sub_tasks;
   public subtasks: sub_tasks[] = [];
-  public colors:string[] = ['primary','accent','warn','red','deep-purple','amber','green','red','pink'];
+  public colors:string[] = ['primary','primary','primary','primary','primary','primary'];
+  public defineColors:string[] = ['box bg-primary','box bg-danger','box bg-success','box bg-info','box bg-warning','box bg-secondary'];
   public task: Task = {
     name: 'Channels',
     completed: false,
@@ -984,7 +985,8 @@ export class D3VisComponent implements OnInit {
       this.subtask = {
         name: channel,
         completed: false,
-        color: this.colors[index]
+        color: this.colors[index],
+        definedColor : this.defineColors[index]
       }
       this.subtasks.push(this.subtask)
     });

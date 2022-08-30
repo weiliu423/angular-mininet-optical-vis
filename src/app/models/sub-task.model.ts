@@ -3,5 +3,6 @@ export class sub_tasks{
         public name: string,
         public completed : boolean = false,
         public color: string,
+        public definedColor: string,
      ) {}
 }
