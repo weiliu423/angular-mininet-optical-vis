@@ -151,7 +151,8 @@ export class D3VisComponent implements OnInit {
   public topo: any; // keep track of topo.
   public animated: boolean = true; // animated or static
   public svg: any;
-  public color: any;
+  //public color: any;
+  public bilinks: any;
   public src_node: any;
   public dst_node: any;
   public text: any;
@@ -161,9 +162,10 @@ export class D3VisComponent implements OnInit {
   public targetPort: any;
   public target: any;
   public portStatus: any;
-
+  public node_sel:any;
+  public desc_sel:any;
   initialize_topo() {
-    this.color = d3.scaleOrdinal(d3.schemeCategory20);
+    //this.color = d3.scaleOrdinal(d3.schemeCategory10);
     /*
             create container for links and nodes elements.
         */
@@ -343,8 +345,8 @@ export class D3VisComponent implements OnInit {
     /*
             load: load new nodes, links to simulation.
         */
-    let simulation = this.topo["simulation"],
-      link_frc = this.topo["link_force"],
+    this.simulation = this.topo["simulation"];
+    let  link_frc = this.topo["link_force"],
       drag = this.topo["drag"],
       node_tip = this.topo["node_tip"],
       link_src_tip = this.topo["link_source_tip"],
@@ -374,6 +376,8 @@ export class D3VisComponent implements OnInit {
         target_port_disp: any;
       }[] = [];
 
+      this.bilinks = bilinks;
+
       graph.links.forEach((link: any, idx: any) => {
         let src = (link.source = node_by_id.get(link.source)),
           target = (link.target = node_by_id.get(link.target)),
@@ -402,15 +406,15 @@ export class D3VisComponent implements OnInit {
         .select("g.links")
         .selectAll("g.link_container")
         .data(bilinks);
+      
       link.exit().remove();
+
       let new_link = link
         .enter()
         .append("g")
-        .classed("link_container", true)
         .attr("stroke", (d: any) => {
-          return this.color(d.source_port_disp);
-        });
-
+            return "#6c757d"
+        }).classed("link_container", true);
       new_link.append("path").classed("link_item", true);
 
       new_link
@@ -546,7 +550,13 @@ export class D3VisComponent implements OnInit {
         });
 
       link = new_link.merge(link);
+      // var lines = d3.selectAll('.flowline');
 
+      // var offset = 1; 
+      // setInterval(() => {
+      //   lines.style('stroke-dashoffset', offset);
+      //   offset += 1; 
+      // }, 50);
       /*
                 update node visualization
             */
@@ -590,7 +600,8 @@ export class D3VisComponent implements OnInit {
           } else if (d.device_info == "Terminal") {
             return "#0080FC";
           } else {
-            return this.color(d.source);
+            return "#000000";
+            //return this.color(d.source);
           }
         });
 
@@ -697,7 +708,7 @@ export class D3VisComponent implements OnInit {
       /*
                 apply new nodes, links to logics
             */
-      simulation.nodes(graph.nodes);
+      this.simulation.nodes(graph.nodes);
       link_frc.links(graph.links);
       // link_frc.links(links);
 
@@ -705,10 +716,10 @@ export class D3VisComponent implements OnInit {
                 update link, node selection closure.
                 for performance.
             */
-      simulation.on("tick", () => {
+      this.simulation.on("tick", () => {
         this.do_tick(link, node, desc);
       });
-      this.simulation = simulation;
+      this.simulation =  this.simulation;
       this.do_layout();
     });
   }
@@ -816,6 +827,8 @@ export class D3VisComponent implements OnInit {
           update visualization of links
               path
       */
+    this.node_sel = node_sel;
+    this.desc_sel = desc_sel;
     this.text.attr("text", (d: any) => {
       return (
         "M" +
@@ -919,8 +932,9 @@ export class D3VisComponent implements OnInit {
   //#region Helper Methods
   public subtask!: sub_tasks;
   public subtasks: sub_tasks[] = [];
-  public colors:string[] = ['primary','primary','primary','primary','primary','primary'];
+  public chanellcolors : string[] = ['primary','primary','primary','primary','primary','primary'];
   public defineColors:string[] = ['box bg-primary','box bg-danger','box bg-success','box bg-info','box bg-warning','box bg-secondary'];
+  public channelDefaultColours : string[] = ['#6c757d', '#0d6efd','#dc3545','#198754','#0dcaf0','#ffc107'];
   public filteredSigtraceData!: chartData;
   public directionsData!: direction;
   public filteredSigtraceDataList: chartData[] = [];
@@ -932,14 +946,10 @@ export class D3VisComponent implements OnInit {
     subtasks: this.subtasks,
   };
   resetNodeSelection() {
-    console.log(this.nodeSelection.nativeElement.files);
     this.nodeSelection.nativeElement.value = "";
-    console.log(this.nodeSelection.nativeElement.files);
   }
   resetLinkSelection() {
-    console.log(this.linkSelection.nativeElement.files);
     this.linkSelection.nativeElement.value = "";
-    console.log(this.linkSelection.nativeElement.files);
   }
   createOnline$() {
     return merge<any>(
@@ -954,12 +964,14 @@ export class D3VisComponent implements OnInit {
   updateAllComplete() {
     if(this.task.subtasks != null)
     {
-        
+        let dataByDirection: any;
+        let index = 0;
         this.filteredSigtraceDataList = []
         let selected = this.task.subtasks.filter(t => t.completed == true)
         selected.forEach(element => {
+          index = element.id + 1;
           let data = this.sigtraceData.filter(x => x.Channel.includes(element.name))
-          let dataByDirection = this.groupBy(data, 'direction');
+          dataByDirection = this.groupBy(data, 'direction');
 
           this.directionsData = {
             Input: dataByDirection['Input'],
@@ -973,12 +985,32 @@ export class D3VisComponent implements OnInit {
           this.filteredSigtraceDataList.push(this.filteredSigtraceData)
         });
         console.log('filter data', this.filteredSigtraceDataList)
-        if(this.initialChart == true)
-        {
-          console.log(this.d3chart)
-          //this.d3chart.updatedData(this.filteredSigtraceDataList);
-        }
-        this.initialChart = true;
+
+        this.svg = d3.select(this.svgContainerRef.nativeElement)
+        .selectAll("g.link_container")
+        .filter((d:any) => {
+          //console.log(d)
+          let sources:any = []
+          if(dataByDirection != null)
+          {
+            dataByDirection['Input'].forEach((item: any) =>{
+              sources.push(item.link)
+            })
+            dataByDirection['Output'].forEach((item: any) =>{
+              sources.push(item.link.toUpperCase())
+            })
+          }
+          
+          if(sources.length > 0)
+          {
+            return (sources.includes(d.source.id.toUpperCase()) && sources.includes(d.target.id.toUpperCase()))
+          }else{
+            return true
+          }
+          //return (d.source === thisNode) || (d.target === thisNode);
+        })
+        .style("stroke", this.channelDefaultColours[index])
+
     }
   }
   setAll(completed: boolean) {
@@ -1013,9 +1045,10 @@ export class D3VisComponent implements OnInit {
     this.channels = this.channels.sort();
     this.channels.forEach((channel: string, index:any) =>{
       this.subtask = {
+        id: index,
         name: channel,
         completed: false,
-        color: this.colors[index],
+        color: this.chanellcolors[index],
         definedColor : this.defineColors[index]
       }
       this.subtasks.push(this.subtask)
