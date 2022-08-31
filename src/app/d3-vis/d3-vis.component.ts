@@ -61,7 +61,7 @@ export class D3VisComponent implements OnInit {
   public monitorData: any;
   public sigtraceData: sigtraceData[] = [];
   public osnrData: any = [];
-  public channels : string[] = [];
+  public channels: string[] = [];
   public allComplete: boolean = false;
   public initialChart: boolean = false;
   @ViewChild(DialogComponent) dialog!: DialogComponent;
@@ -108,7 +108,7 @@ export class D3VisComponent implements OnInit {
           this.apiStatus = "200 - Success";
           this.apiStatusStyle = "text-success";
           this.notifierService.notify("success", "API online.");
-          this.getAllChannels()
+          this.getAllChannels();
         }
         if (resp.error != null) {
           this.notifierService.notify("error", "Failed to load API.");
@@ -162,8 +162,8 @@ export class D3VisComponent implements OnInit {
   public targetPort: any;
   public target: any;
   public portStatus: any;
-  public node_sel:any;
-  public desc_sel:any;
+  public node_sel: any;
+  public desc_sel: any;
   initialize_topo() {
     //this.color = d3.scaleOrdinal(d3.schemeCategory10);
     /*
@@ -346,7 +346,7 @@ export class D3VisComponent implements OnInit {
             load: load new nodes, links to simulation.
         */
     this.simulation = this.topo["simulation"];
-    let  link_frc = this.topo["link_force"],
+    let link_frc = this.topo["link_force"],
       drag = this.topo["drag"],
       node_tip = this.topo["node_tip"],
       link_src_tip = this.topo["link_source_tip"],
@@ -406,15 +406,16 @@ export class D3VisComponent implements OnInit {
         .select("g.links")
         .selectAll("g.link_container")
         .data(bilinks);
-      
+
       link.exit().remove();
 
       let new_link = link
         .enter()
         .append("g")
         .attr("stroke", (d: any) => {
-            return "#6c757d"
-        }).classed("link_container", true);
+          return "#6c757d";
+        })
+        .classed("link_container", true);
       new_link.append("path").classed("link_item", true);
 
       new_link
@@ -552,10 +553,10 @@ export class D3VisComponent implements OnInit {
       link = new_link.merge(link);
       // var lines = d3.selectAll('.flowline');
 
-      // var offset = 1; 
+      // var offset = 1;
       // setInterval(() => {
       //   lines.style('stroke-dashoffset', offset);
-      //   offset += 1; 
+      //   offset += 1;
       // }, 50);
       /*
                 update node visualization
@@ -719,7 +720,7 @@ export class D3VisComponent implements OnInit {
       this.simulation.on("tick", () => {
         this.do_tick(link, node, desc);
       });
-      this.simulation =  this.simulation;
+      this.simulation = this.simulation;
       this.do_layout();
     });
   }
@@ -932,17 +933,38 @@ export class D3VisComponent implements OnInit {
   //#region Helper Methods
   public subtask!: sub_tasks;
   public subtasks: sub_tasks[] = [];
-  public chanellcolors : string[] = ['primary','primary','primary','primary','primary','primary'];
-  public defineColors:string[] = ['box bg-primary','box bg-danger','box bg-success','box bg-info','box bg-warning','box bg-secondary'];
-  public channelDefaultColours : string[] = ['#6c757d', '#0d6efd','#dc3545','#198754','#0dcaf0','#ffc107'];
+  public chanellcolors: string[] = [
+    "primary",
+    "primary",
+    "primary",
+    "primary",
+    "primary",
+    "primary",
+  ];
+  public defineColors: string[] = [
+    "box bg-primary",
+    "box bg-danger",
+    "box bg-success",
+    "box bg-info",
+    "box bg-warning",
+    "box bg-secondary",
+  ];
+  public channelDefaultColours: string[] = [
+    "#6c757d",
+    "#0d6efd",
+    "#dc3545",
+    "#198754",
+    "#0dcaf0",
+    "#ffc107",
+  ];
   public filteredSigtraceData!: chartData;
   public directionsData!: direction;
   public filteredSigtraceDataList: chartData[] = [];
-  @ViewChild(D3LineChartComponent) d3chart! :D3LineChartComponent;
+  @ViewChild(D3LineChartComponent) d3chart!: D3LineChartComponent;
   public task: Task = {
-    name: 'Channels',
+    name: "Channels",
     completed: false,
-    color: 'primary',
+    color: "primary",
     subtasks: this.subtasks,
   };
   resetNodeSelection() {
@@ -961,56 +983,167 @@ export class D3VisComponent implements OnInit {
       })
     );
   }
+  public interValId: any;
   updateAllComplete() {
-    if(this.task.subtasks != null)
-    {
-        let dataByDirection: any;
-        let index = 0;
-        this.filteredSigtraceDataList = []
-        let selected = this.task.subtasks.filter(t => t.completed == true)
-        selected.forEach(element => {
-          index = element.id + 1;
-          let data = this.sigtraceData.filter(x => x.Channel.includes(element.name))
-          dataByDirection = this.groupBy(data, 'direction');
+    if (this.task.subtasks != null) {
+      let defaults: any = true;
+      let dataByDirection: any;
+      let index = 0;
+      this.filteredSigtraceDataList = [];
+      let selected = this.task.subtasks.filter((t) => t.completed == true);
+      selected.forEach((element) => {
+        index = element.id + 1;
+        let data = this.sigtraceData.filter((x) =>
+          x.Channel.includes(element.name)
+        );
+        dataByDirection = this.groupBy(data, "direction");
 
-          this.directionsData = {
-            Input: dataByDirection['Input'],
-            Output: dataByDirection['Output']
-          }
-          this.filteredSigtraceData = {
-            channelName : element.name,
-            observations : this.directionsData
-          }
-          
-          this.filteredSigtraceDataList.push(this.filteredSigtraceData)
-        });
-        console.log('filter data', this.filteredSigtraceDataList)
+        this.directionsData = {
+          Input: dataByDirection["Input"],
+          Output: dataByDirection["Output"],
+        };
+        this.filteredSigtraceData = {
+          channelName: element.name,
+          observations: this.directionsData,
+        };
 
-        this.svg = d3.select(this.svgContainerRef.nativeElement)
+        this.filteredSigtraceDataList.push(this.filteredSigtraceData);
+      });
+
+      this.svg = d3
+        .select(this.svgContainerRef.nativeElement)
         .selectAll("g.link_container")
-        .filter((d:any) => {
+        .filter((d: any) => {
           //console.log(d)
-          let sources:any = []
-          if(dataByDirection != null)
-          {
-            dataByDirection['Input'].forEach((item: any) =>{
-              sources.push(item.link)
-            })
-            dataByDirection['Output'].forEach((item: any) =>{
-              sources.push(item.link.toUpperCase())
-            })
+          let sources: any = [];
+
+          if (dataByDirection != null) {
+            dataByDirection["Input"].forEach((item: any) => {
+              if (item.link.includes("(") || !item.link.includes("<")) {
+                if (item.link.includes("(")) {
+                  let split_link = [];
+                  split_link = item.link
+                    .substring(1, item.link.length - 1)
+                    .split("->");
+                  split_link.forEach((node: any) => {
+                    sources.push(node.toUpperCase());
+                  });
+                } else {
+                  sources.push(item.link.toUpperCase());
+                }
+              }
+            });
+            dataByDirection["Output"].forEach((item: any) => {
+              if (item.link.includes("(") || !item.link.includes("<")) {
+                if (item.link.includes("(")) {
+                  let split_link = [];
+                  split_link = item.link
+                    .substring(1, item.link.length - 1)
+                    .split("->");
+                  split_link.forEach((node: any) => {
+                    sources.push(node.toUpperCase());
+                  });
+                } else {
+                  sources.push(item.link.toUpperCase());
+                }
+              }
+            });
+          } else {
+            index = 0;
           }
-          
-          if(sources.length > 0)
-          {
-            return (sources.includes(d.source.id.toUpperCase()) && sources.includes(d.target.id.toUpperCase()))
-          }else{
-            return true
+          if (sources.length > 0) {
+            defaults = false;
+            //console.log(d.source.id.toUpperCase() , d.target.id.toUpperCase(), (sources.includes(d.source.id.toUpperCase()) && sources.includes(d.target.id.toUpperCase())))
+            return (
+              sources.includes(d.source.id.toUpperCase()) &&
+              sources.includes(d.target.id.toUpperCase())
+            );
+          } else {
+            index = 0;
+            defaults = true;
+            return true;
           }
           //return (d.source === thisNode) || (d.target === thisNode);
         })
-        .style("stroke", this.channelDefaultColours[index])
+        .style("stroke", this.channelDefaultColours[index]);
 
+      var lines = (this.svg = d3
+        .select(this.svgContainerRef.nativeElement)
+        .selectAll("g.link_container")
+        .filter((d: any) => {
+          //console.log(d)
+          let sources: any = [];
+
+          if (dataByDirection != null) {
+            dataByDirection["Input"].forEach((item: any) => {
+              if (item.link.includes("(") || !item.link.includes("<")) {
+                if (item.link.includes("(")) {
+                  let split_link = [];
+                  split_link = item.link
+                    .substring(1, item.link.length - 1)
+                    .split("->");
+                  split_link.forEach((node: any) => {
+                    sources.push(node.toUpperCase());
+                  });
+                } else {
+                  sources.push(item.link.toUpperCase());
+                }
+              }
+            });
+            dataByDirection["Output"].forEach((item: any) => {
+              if (item.link.includes("(") || !item.link.includes("<")) {
+                if (item.link.includes("(")) {
+                  let split_link = [];
+                  split_link = item.link
+                    .substring(1, item.link.length - 1)
+                    .split("->");
+                  console.log(split_link);
+                  split_link.forEach((node: any) => {
+                    sources.push(node.toUpperCase());
+                  });
+                } else {
+                  sources.push(item.link.toUpperCase());
+                }
+              }
+            });
+          }
+
+          if (sources.length > 0) {
+            defaults = false;
+            //console.log(d.source.id.toUpperCase() , d.target.id.toUpperCase(), (sources.includes(d.source.id.toUpperCase()) && sources.includes(d.target.id.toUpperCase())))
+            return (
+              sources.includes(d.source.id.toUpperCase()) &&
+              sources.includes(d.target.id.toUpperCase())
+            );
+          } else {
+            defaults = true;
+            return true;
+          }
+          //return (d.source === thisNode) || (d.target === thisNode);
+        }));
+      // Updates the offset of dashes every 50ms:
+      var offset = -1;
+      if (defaults == false) {
+        this.interValId = setInterval(() => {
+          lines
+            .style("stroke-dashoffset", offset)
+            .style("opacity", 0.5)
+            .style("stroke-dasharray", 20);
+          offset += -1;
+        }, 40);
+      } else {
+        lines
+          .transition()
+          .style("stroke-dashoffset", 0)
+          .style("opacity", 1)
+          .style("stroke-dasharray", 0);
+        this.ngOnDestroy();
+      }
+    }
+  }
+  ngOnDestroy() {
+    if (this.interValId) {
+      clearInterval(this.interValId);
     }
   }
   setAll(completed: boolean) {
@@ -1018,49 +1151,48 @@ export class D3VisComponent implements OnInit {
     if (this.task.subtasks == null) {
       return;
     }
-    this.task.subtasks.forEach(t => (t.completed = completed));
+    this.task.subtasks.forEach((t) => (t.completed = completed));
   }
-  getAllChannels()
-  {
-    if(this.osnrData != null)
-    {
-      this.osnrData.forEach((device : any) => {
+  getAllChannels() {
+    if (this.osnrData != null) {
+      this.osnrData.forEach((device: any) => {
         let dictKey = Object.values(device);
-        dictKey.forEach((key:any) => {
-          if(key.includes("channel"))
-          {
-            let channel: string = ""
-            let device_value = key.split(':')
-            channel = device_value[1]
-            if(this.channels.indexOf(channel) > -1)
-            {
-              console.log("Channel already exist")
-            }else{
-              this.channels.push(channel)
+        dictKey.forEach((key: any) => {
+          if (key.includes("channel")) {
+            let channel: string = "";
+            let device_value = key.split(":");
+            channel = device_value[1];
+            if (this.channels.indexOf(channel) > -1) {
+              console.log("Channel already exist");
+            } else {
+              this.channels.push(channel);
             }
           }
-        })
+        });
       });
     }
     this.channels = this.channels.sort();
-    this.channels.forEach((channel: string, index:any) =>{
+    this.channels.forEach((channel: string, index: any) => {
       this.subtask = {
         id: index,
         name: channel,
         completed: false,
         color: this.chanellcolors[index],
-        definedColor : this.defineColors[index]
-      }
-      this.subtasks.push(this.subtask)
+        definedColor: this.defineColors[index],
+      };
+      this.subtasks.push(this.subtask);
     });
   }
-  groupBy(arr :any, property:any) {
-    return arr.reduce((memo :any, x:any) => {
-      if (!memo[x[property]]) { memo[x[property]] = []; }
+  groupBy(arr: any, property: any) {
+    return arr.reduce((memo: any, x: any) => {
+      if (!memo[x[property]]) {
+        memo[x[property]] = [];
+      }
       memo[x[property]].push(x);
       return memo;
     }, {});
   }
+
   //#endregion
   //#region Firebase Methods
   public storageUrl: string = "gs://mininet-optical-file-system.appspot.com";
