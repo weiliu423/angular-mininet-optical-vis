@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, tap, take } from 'rxjs/operators';
 import { file_upload, osnr_mapping_data } from '../models/osnr_mapping.model';
+import { sigtraceData } from '../models/sigtrace-resp.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -39,8 +40,8 @@ export class PythonApiService {
       );
   }
 
-  getSigTraceData() : Observable<[]> {
-    return this.http.get<[]>(`${this.api}sigtrace`, {
+  getSigTraceData() : Observable<sigtraceData[]> {
+    return this.http.get<sigtraceData[]>(`${this.api}sigtrace`, {
         headers: new HttpHeaders().set('Access-Control-Allow-Origin', '*')})
       .pipe(
         take(1),

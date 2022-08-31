@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   OnInit,
+  Output,
   ViewChild,
 } from "@angular/core";
 var d3 = require("d3");
@@ -24,6 +25,9 @@ import { file_upload } from "../models/osnr_mapping.model";
 import { DialogComponent } from "../dialog/dialog.component";
 import { ThemePalette } from "@angular/material/core";
 import { sub_tasks } from "../models/sub-task.model";
+import { sigtraceData } from "../models/sigtrace-resp.model";
+import { chartData, direction } from "../models/chart-data.model";
+import { D3LineChartComponent } from "../d3-line-chart/d3-line-chart.component";
 //Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCeRkrVepStRHHP-5WuMgJ80f3hIfTLn_0",
@@ -55,10 +59,11 @@ export class D3VisComponent implements OnInit {
   public height: any;
   public enableSideView: any = false;
   public monitorData: any;
-  public sigtraceData: any;
+  public sigtraceData: sigtraceData[] = [];
   public osnrData: any = [];
   public channels : string[] = [];
   public allComplete: boolean = false;
+  public initialChart: boolean = false;
   @ViewChild(DialogComponent) dialog!: DialogComponent;
 
   constructor(
@@ -98,7 +103,6 @@ export class D3VisComponent implements OnInit {
       let getOSNR: any;
       getOSNR = this.apiService.getOSNRData();
       getOSNR.subscribe((resp: any) => {
-        console.log(resp);
         if (resp.data?.length > 0) {
           this.osnrData = resp.data;
           this.apiStatus = "200 - Success";
@@ -126,7 +130,6 @@ export class D3VisComponent implements OnInit {
       let getSigtraceData: any;
       getSigtraceData = this.apiService.getSigTraceData();
       getSigtraceData.subscribe((resp: any) => {
-        //this.monitorData = resp.data;
         if (resp.data != null) {
           this.sigtraceData = resp.data;
         }
@@ -195,7 +198,6 @@ export class D3VisComponent implements OnInit {
                 force simulation
             */
       this.simulation = d3.forceSimulation().stop();
-      console.log(this.height);
       /*
                 force
             */
@@ -229,7 +231,6 @@ export class D3VisComponent implements OnInit {
             } else if (d.device_info == "OVSBridge") {
               return -100;
             } else if (d.device_info == "Terminal") {
-              console.log(d.device_info);
               return -1100;
             } else {
               return -700;
@@ -920,6 +921,10 @@ export class D3VisComponent implements OnInit {
   public subtasks: sub_tasks[] = [];
   public colors:string[] = ['primary','primary','primary','primary','primary','primary'];
   public defineColors:string[] = ['box bg-primary','box bg-danger','box bg-success','box bg-info','box bg-warning','box bg-secondary'];
+  public filteredSigtraceData!: chartData;
+  public directionsData!: direction;
+  public filteredSigtraceDataList: chartData[] = [];
+  @ViewChild(D3LineChartComponent) d3chart! :D3LineChartComponent;
   public task: Task = {
     name: 'Channels',
     completed: false,
@@ -947,8 +952,34 @@ export class D3VisComponent implements OnInit {
     );
   }
   updateAllComplete() {
-    console.log(this.task.subtasks)
-    this.allComplete = this.task.subtasks != null && this.task.subtasks.every(t => t.completed);
+    if(this.task.subtasks != null)
+    {
+        
+        this.filteredSigtraceDataList = []
+        let selected = this.task.subtasks.filter(t => t.completed == true)
+        selected.forEach(element => {
+          let data = this.sigtraceData.filter(x => x.Channel.includes(element.name))
+          let dataByDirection = this.groupBy(data, 'direction');
+
+          this.directionsData = {
+            Input: dataByDirection['Input'],
+            Output: dataByDirection['Output']
+          }
+          this.filteredSigtraceData = {
+            channelName : element.name,
+            observations : this.directionsData
+          }
+          
+          this.filteredSigtraceDataList.push(this.filteredSigtraceData)
+        });
+        console.log('filter data', this.filteredSigtraceDataList)
+        if(this.initialChart == true)
+        {
+          console.log(this.d3chart)
+          //this.d3chart.updatedData(this.filteredSigtraceDataList);
+        }
+        this.initialChart = true;
+    }
   }
   setAll(completed: boolean) {
     this.allComplete = completed;
@@ -961,7 +992,6 @@ export class D3VisComponent implements OnInit {
   {
     if(this.osnrData != null)
     {
-      console.log(this.osnrData)
       this.osnrData.forEach((device : any) => {
         let dictKey = Object.values(device);
         dictKey.forEach((key:any) => {
@@ -990,7 +1020,13 @@ export class D3VisComponent implements OnInit {
       }
       this.subtasks.push(this.subtask)
     });
-    console.log(this.subtasks)
+  }
+  groupBy(arr :any, property:any) {
+    return arr.reduce((memo :any, x:any) => {
+      if (!memo[x[property]]) { memo[x[property]] = []; }
+      memo[x[property]].push(x);
+      return memo;
+    }, {});
   }
   //#endregion
   //#region Firebase Methods
@@ -1052,7 +1088,6 @@ export class D3VisComponent implements OnInit {
       let storage = getStorage();
       getDownloadURL(ref(storage, this.storageUrl + "/data.json"))
         .then((url) => {
-          console.log(url);
           this.dataJsonUrl = url;
           this.initialize_topo();
           this.load();

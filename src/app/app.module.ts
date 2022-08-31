@@ -7,7 +7,7 @@ import { NetworkTopologyComponent } from './network-topology/network-topology.co
 import { SigmaVisComponent } from './sigma-vis/sigma-vis.component';
 import { D3VisComponent } from './d3-vis/d3-vis.component';
 import { HttpClientModule } from '@angular/common/http';
-import { D3NetworkComponent } from './d3-network/d3-network.component';
+import { D3LineChartComponent } from './d3-line-chart/d3-line-chart.component';
 import { environment } from 'src/environments/environment';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
@@ -63,7 +63,7 @@ const customNotifierOptions: NotifierOptions = {
     NetworkTopologyComponent,
     SigmaVisComponent,
     D3VisComponent,
-    D3NetworkComponent,
+    D3LineChartComponent,
     DialogComponent,
     DialogData
   ],

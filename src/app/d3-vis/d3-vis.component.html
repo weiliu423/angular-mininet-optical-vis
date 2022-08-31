@@ -84,4 +84,11 @@
   </svg>  
 </div>
 </div>
+<div *ngIf="filteredSigtraceDataList.length > 0">
+  <hr>
+    <h1 class="text-center">Power vs Link</h1>
+  <hr>
+  <app-d3-line-chart [channelData]="filteredSigtraceDataList"></app-d3-line-chart>
+</div>
+
 

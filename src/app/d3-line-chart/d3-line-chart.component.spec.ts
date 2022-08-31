@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { D3NetworkComponent } from './d3-network.component';
+import { D3LineChartComponent } from './d3-line-chart.component';
 
-describe('D3NetworkComponent', () => {
-  let component: D3NetworkComponent;
-  let fixture: ComponentFixture<D3NetworkComponent>;
+describe('D3LineChartComponent', () => {
+  let component: D3LineChartComponent;
+  let fixture: ComponentFixture<D3LineChartComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ D3NetworkComponent ]
+      declarations: [ D3LineChartComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(D3NetworkComponent);
+    fixture = TestBed.createComponent(D3LineChartComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

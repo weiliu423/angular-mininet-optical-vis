@@ -132,22 +132,69 @@
 
 
 
-/* debug: show intermediate nodes */
-.intermediate_nodes {
-  stroke: #000;
-  stroke-width: 1.5px;
+.bar:hover {
+  fill: brown;
 }
-
-.node {
-  stroke: white;
-  stroke-width: 2px;
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 3px;
 }
-
-.link {
-stroke-width: 1.5px;
+.circle {
+  fill: steelblue;
 }
-
 
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Style the dots by assigning a fill and stroke */
+.dot {
+  fill: #ffab00;
+  stroke: #fff;
+}
+
+label {
+  font-size: 1.1em;
+}
+.lable{
+  font-size: 1.1em;
+  font-weight: 600;
+  color:#1ca2db
+}
+.chart-container {
+  margin-left: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: inline-block;
+  width: 95%;
+}
+
+.chart-options{
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+.chart-card {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.svg-chart {
+    width: 100%;
+}
+
+@media (min-height: 500px) {
+  .svg-chart {
+    height: 400px;
+  }
+}
+@media (min-height: 750px) {
+  .svg-chart {
+    height: 500px;
+  }
+}
+@media (min-height: 1000px) {
+  .svg-chart {
+    height: 800px;
+  }
+}
+
