@@ -1364,6 +1364,7 @@ export class D3VisComponent implements OnInit {
       //d3.select(this.svgContainerRef.nativeElement).selectAll("g.nodes").remove();//add this to remove the nodes
       this.linkfileParse();
       this.cdr.detectChanges();
+      this.simulation.alpha(1).restart();
       this.loadFileStatus = "Files loaded";
       this.loadFileStatuStyle = "text-success";
       this.notifier.notify("success", "File loaded successfully!");
