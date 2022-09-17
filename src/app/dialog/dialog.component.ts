@@ -34,11 +34,14 @@ export class DialogComponent {
   templateUrl: './dialog-data.component.html',
   styleUrls: ['./dialog.component.css']
 })
+
+//This is the popup dialog
 export class DialogData {
   constructor(
     public dialogRef: MatDialogRef<DialogData>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
   ) {
+    //Parameter passed from another component
     dialogRef.disableClose = true;
   }
   public rows: any;
@@ -48,6 +51,7 @@ export class DialogData {
   public data_row_value: any = [];
   public no_data_resp: string = "NO DATA FOUND!"
   title!: string;
+
   ngOnInit() {
     this.title = this.data.title;
     if(this.data.data === undefined)
@@ -55,6 +59,7 @@ export class DialogData {
       console.log(this.no_data_resp)
     }
     else{
+      //Iterative through the data key and value and map accordlying
       const obj = JSON.parse(this.data.data.toString());
       this.rows = Object.values(obj);
       this.rows.forEach((element:any, index: any) => {
@@ -79,12 +84,8 @@ export class DialogData {
       }
     }
   }
+  //Close the dialog
   onNoClick(): void {
     this.dialogRef.close();
   }
 }
-
-
-/**  Copyright 2022 Google LLC. All Rights Reserved.
-    Use of this source code is governed by an MIT-style license that
-    can be found in the LICENSE file at https://angular.io/license */

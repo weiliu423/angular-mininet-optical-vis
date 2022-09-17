@@ -6,6 +6,7 @@ import { AfterViewInit, Component, ElementRef, HostListener, Input, OnChanges, O
   styleUrls: ['./network-topology.component.css']
 })
 
+//This is the parent component used within the root component (app.component)
 export class NetworkTopologyComponent implements OnInit {
   
   constructor() { 

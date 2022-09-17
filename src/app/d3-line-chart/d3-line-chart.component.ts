@@ -65,7 +65,7 @@ export class D3LineChartComponent implements OnInit {
     // Do some automatic scaling for the chart
     this.width = svgElement.clientWidth - this.margin.left - this.margin.right;
     this.height = svgElement.clientHeight * 0.90 - this.margin.top - this.margin.bottom;
-    this.svg = this.host.select('svg')//.attr("viewBox", "0 0 3000 730")
+    this.svg = this.host.select('svg')
       .append('g')
       .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 
@@ -126,6 +126,8 @@ export class D3LineChartComponent implements OnInit {
    */
   private buildChartData(): any[] {
     let data: any = [];
+
+    // Populate X and Y data used
     if (this.chartData != null
       && this.chartData.data != null) {
       let value: any = null;
@@ -181,19 +183,14 @@ export class D3LineChartComponent implements OnInit {
   }
 
   /**
-   * Configures the X-axis based on the time series
+   * Configures the X-axis based on the node
    */
   private configureXaxis(): void {
     // range of data configuring, in this case we are
-    // showing data over a period of time
+    // showing data over each router and link
     this.x = d3Scale.scaleBand()
       .rangeRound([0, this.width]).padding(1)
-      //.domain((d :any) => { return d.link; })
-      //.domain(d3Array.extent(this.data, (d:any) => {d.link}));
-    // Add the X-axis definition to the bottom of the chart
-    // this.svg.append('g')
-    //   .attr('transform', 'translate(0,' + this.height + ')')
-    //   .call(d3Axis.axisBottom(this.x)).style("font-size", "1.0em");
+
     this.g = this.svg.append("g")
     .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
@@ -216,14 +213,16 @@ export class D3LineChartComponent implements OnInit {
       .x((d: any) => this.x(d.link))
       .y((d: any) => this.y(d.value));
 
+    // Map x-axis with each data link value
     this.x.domain(this.data.map((d :any) => { return d.link; }))
-    //this.y.domain([0, d3.max(this.data, (d:any) => { return d.power; })]);
 
+    // X-axis styling
     this.g.append("g")
     .attr("class", "axis axis--x")
     .attr('transform', 'translate(0,' + this.height + ')')
     .call(d3Axis.axisBottom(this.x)).style("font-size", "0.8em");
 
+    // Add line and text styling
     this.g.append("g")
       .attr("class", "axis axis--y")
       .call(d3Axis.axisLeft(this.y)).style("font-size", "1.0em")
@@ -236,7 +235,7 @@ export class D3LineChartComponent implements OnInit {
       .attr("dy", ".75em")
       .text("Power (dbm)");
 
-    
+    // Add path line for the graph and style the line 
     this.g.append("path")
     .datum(this.data)
     .attr("class", "line")
@@ -247,6 +246,7 @@ export class D3LineChartComponent implements OnInit {
     .attr("stroke-linecap", "round")
     .attr("d", line);
 
+    // Style the circle for the path link and map x and y coordinate of the circle
     this.g.selectAll("circle")
       .data(this.data)
       .enter().append("circle")
@@ -257,9 +257,11 @@ export class D3LineChartComponent implements OnInit {
 
   }
 
+  //Update line chart when a new channel is selected
   public updatedData(data: any){
     this.channelData = data;
   }
+  //Calculation on path length and map to x cordinate
   correctXScale(d:any){
     return this.x(d.link) + this.width / this.data.length / 2;
   }

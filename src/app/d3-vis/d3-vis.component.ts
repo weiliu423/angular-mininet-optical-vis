@@ -28,7 +28,8 @@ import { sub_tasks } from "../models/sub-task.model";
 import { sigtraceData } from "../models/sigtrace-resp.model";
 import { chartData, direction } from "../models/chart-data.model";
 import { D3LineChartComponent } from "../d3-line-chart/d3-line-chart.component";
-//Firebase configuration
+
+//Firebase configuration 
 const firebaseConfig = {
   apiKey: "AIzaSyCeRkrVepStRHHP-5WuMgJ80f3hIfTLn_0",
   authDomain: "mininet-optical-file-system.firebaseapp.com",
@@ -37,6 +38,7 @@ const firebaseConfig = {
   messagingSenderId: "752741188254",
   appId: "1:752741188254:web:b113a9ec279d157325b18f",
 };
+//Use for firebase server, and can be removed
 initializeApp(firebaseConfig);
 
 export interface Task {
@@ -72,7 +74,9 @@ export class D3VisComponent implements OnInit {
     private notifierService: NotifierService,
     private apiService: PythonApiService
   ) {
+    //Initialise networkData
     this.networkData = new topo([], []);
+    //Initial notification
     this.notifier = notifierService;
   }
   /////////////////////////////////////////////////////////////////
@@ -143,6 +147,9 @@ export class D3VisComponent implements OnInit {
   }
 
   //#region Initial Load/Layout Methods
+  //==============================================================================================================
+  // Note: this project is using D3.js version 4 coding, please refer to https://d3js.org for further explaination
+  //==============================================================================================================
   public selData: any;
   public network!: network;
   public networkData!: topo;
@@ -151,7 +158,6 @@ export class D3VisComponent implements OnInit {
   public topo: any; // keep track of topo.
   public animated: boolean = true; // animated or static
   public svg: any;
-  //public color: any;
   public bilinks: any;
   public src_node: any;
   public dst_node: any;
@@ -186,10 +192,6 @@ export class D3VisComponent implements OnInit {
     if (!descs.size()) {
       descs = this.svg.append("g").attr("class", "desc");
     }
-
-    // /*
-    //     debug
-    // */
     let inter_nodes = this.svg.select("g.intermediate_nodes");
     if (!inter_nodes.size()) {
       inter_nodes = this.svg.append("g").attr("class", "intermediate_nodes");
@@ -209,7 +211,6 @@ export class D3VisComponent implements OnInit {
             return d.id;
           })
           .distance((d: any, i: any) => {
-            //console.log(d.source)
             if (d.source.device_info == "Host") {
               return 60;
             } else if (d.source.device_info == "ROADM") {
@@ -353,15 +354,12 @@ export class D3VisComponent implements OnInit {
       link_dst_tip = this.topo["link_dest_tip"],
       svg = d3.select(this.svgContainerRef.nativeElement);
 
+    // Check if the network is online, can be removed
     if (!this.isNetworkOnline) {
       this.dataJsonUrl = "";
     }
     d3.json(this.dataJsonUrl, (graph: any) => {
-      // console.log(JSON.stringify(this.network));
-      // d3.json(JSON.stringify(this.network), (graph: any) => {
-      //console.log(JSON.stringify(graph));
       graph = graph["topo"];
-      // let links = [];
 
       // A mapping: {node.id: node}
       let node_by_id = d3.map(graph.nodes, (d: any) => {
@@ -378,6 +376,7 @@ export class D3VisComponent implements OnInit {
 
       this.bilinks = bilinks;
 
+      //Extract data and map to node and link
       graph.links.forEach((link: any, idx: any) => {
         let src = (link.source = node_by_id.get(link.source)),
           target = (link.target = node_by_id.get(link.target)),
@@ -388,7 +387,6 @@ export class D3VisComponent implements OnInit {
           { source: src, target: inter },
           { source: inter, target: target }
         );
-        // links.push({'source': src, 'target': inter}, {'source': inter, 'target': target});
         bilinks.push({
           id: link["id"],
           source: src,
@@ -413,6 +411,7 @@ export class D3VisComponent implements OnInit {
         .enter()
         .append("g")
         .attr("stroke", (d: any) => {
+          //Set the colour of links
           return "#6c757d";
         })
         .classed("link_container", true);
@@ -422,6 +421,7 @@ export class D3VisComponent implements OnInit {
         .append("path")
         .classed("link_selector", true)
         .on("click", (d: any) => {
+          //Click action on link
           return console.log("link", d);
         })
         .on("mouseover", (d: any, i: any, n: any) => {
@@ -551,7 +551,7 @@ export class D3VisComponent implements OnInit {
         });
 
       link = new_link.merge(link);
-      // var lines = d3.selectAll('.flowline');
+
 
       // var offset = 1;
       // setInterval(() => {
@@ -561,7 +561,6 @@ export class D3VisComponent implements OnInit {
       /*
                 update node visualization
             */
-
       let node = svg
         .select("g.nodes")
         .selectAll("g.node_container")
@@ -576,7 +575,6 @@ export class D3VisComponent implements OnInit {
         .enter()
         .append("g")
         .on("click", (d: any) => {
-          // console.log(this.monitorData[d.id + '_monitor'])
           this.dialog.openDialog(
             d.id.toUpperCase(),
             this.monitorData === undefined
@@ -596,21 +594,21 @@ export class D3VisComponent implements OnInit {
         })
         .call(drag)
         .attr("stroke", (d: any) => {
+          //Change each node text colour 
           if (d.device_info == "ROADM") {
             return "#FF0000";
           } else if (d.device_info == "Terminal") {
             return "#0080FC";
           } else {
             return "#000000";
-            //return this.color(d.source);
           }
         });
 
-      //new_node.append("circle").attr("r", 30);
 
       new_node
         .append("image")
         .attr("xlink:href", (d: any) => {
+          // This assign each node with their icons
           if (d.device_info == "ROADM") {
             return "https://firebasestorage.googleapis.com/v0/b/mininet-optical-file-system.appspot.com/o/icon%2Fosa_device-wireless-router.png?alt=media&token=4e418f3c-eea4-4ba6-b83b-6c9618cd0910";
           } else if (d.device_info == "Terminal") {
@@ -627,14 +625,7 @@ export class D3VisComponent implements OnInit {
         .attr("y", -30)
         .attr("width", 60)
         .attr("height", 60);
-      // new_node
-      //   .append("text")
-      //   .attr("x", 0)
-      //   .attr("y", 12)
-      //   .classed("ftstcall", true)
-      //   .text((d :any) =>{
-      //     return d.device_name;
-      //   });
+
       new_node
         .append("text")
         .style("fill", "black")
@@ -648,24 +639,11 @@ export class D3VisComponent implements OnInit {
         .attr("x", 0)
         .attr("y", -25)
         .data(new_node);
-      //.enter();
 
       node = new_node.merge(node);
+
       node.attr("class", (d: any) => {
-        let stat_cls;
-        if (d["knmp_on"] && d["ip_on"] && d["snmp_on"]) {
-          stat_cls = "stat_normal";
-        } else if (d["knmp_on"] && d["ip_on"] && !d["snmp_on"]) {
-          stat_cls = "stat_abnormal";
-        } else if (d["knmp_on"] && !d["ip_on"] && !d["snmp_on"]) {
-          stat_cls = "stat_error";
-        } else if (!d["knmp_on"] && !d["ip_on"] && !d["snmp_on"]) {
-          stat_cls = "stat_down";
-        } else {
-          // knmp off, snmp_on -> unknown device.
-          stat_cls = "stat_unknown";
-        }
-        return "node_container " + stat_cls;
+        return "node_container " + "stat_unknown";
       });
 
       /*
@@ -679,39 +657,12 @@ export class D3VisComponent implements OnInit {
             return "id" in d;
           })
         );
-      desc.exit().remove();
-      let new_desc = desc.enter().append("g").classed("desc_container", true);
-
-      new_desc.append("text").attr("x", 0).attr("y", 35);
-
-      desc = new_desc.merge(desc);
-      desc.select("text").text((d: any) => {
-        return d["mac"];
-      });
-
-      // /*******************************************
-      //     BEGIN-debug: show intermediate nodes
-      // */
-      // let inter_node = svg.select('g.intermediate_nodes').selectAll('circle').data(
-      //     graph.nodes.filter((d : any, i:any, n:any) => {
-      //         return !('id' in d);
-      //     })
-      // );
-      // inter_node.exit().remove();
-      // inter_node.enter()
-      //           .append('circle')
-      //           .attr('r', 3)
-      //           .attr('fill', 'white');
-      // /*
-      //     END-debug
-      // *********************************************/
 
       /*
                 apply new nodes, links to logics
             */
       this.simulation.nodes(graph.nodes);
       link_frc.links(graph.links);
-      // link_frc.links(links);
 
       /*
                 update link, node selection closure.
@@ -726,6 +677,7 @@ export class D3VisComponent implements OnInit {
   }
 
   do_layout() {
+    
     let svg = d3.select(this.svgContainerRef.nativeElement),
       center_frc = this.topo["center_force"];
 
@@ -733,6 +685,7 @@ export class D3VisComponent implements OnInit {
     this.height = +svg.style("height").replace("px", "");
     center_frc.x(this.width / 2).y(this.height / 2);
 
+    // Animation or Static
     if (this.animated) {
       this.do_animated_layout();
     } else {
@@ -1009,12 +962,11 @@ export class D3VisComponent implements OnInit {
 
         this.filteredSigtraceDataList.push(this.filteredSigtraceData);
       });
-
+      //Set animation style when channel is selected
       this.svg = d3
         .select(this.svgContainerRef.nativeElement)
         .selectAll("g.link_container")
         .filter((d: any) => {
-          //console.log(d)
           let sources: any = [];
 
           if (dataByDirection != null) {
@@ -1053,7 +1005,6 @@ export class D3VisComponent implements OnInit {
           }
           if (sources.length > 0) {
             defaults = false;
-            //console.log(d.source.id.toUpperCase() , d.target.id.toUpperCase(), (sources.includes(d.source.id.toUpperCase()) && sources.includes(d.target.id.toUpperCase())))
             return (
               sources.includes(d.source.id.toUpperCase()) &&
               sources.includes(d.target.id.toUpperCase())
@@ -1063,7 +1014,6 @@ export class D3VisComponent implements OnInit {
             defaults = true;
             return true;
           }
-          //return (d.source === thisNode) || (d.target === thisNode);
         })
         .style("stroke", this.channelDefaultColours[index]);
 
@@ -1071,7 +1021,6 @@ export class D3VisComponent implements OnInit {
         .select(this.svgContainerRef.nativeElement)
         .selectAll("g.link_container")
         .filter((d: any) => {
-          //console.log(d)
           let sources: any = [];
 
           if (dataByDirection != null) {
@@ -1097,7 +1046,6 @@ export class D3VisComponent implements OnInit {
                   split_link = item.link
                     .substring(1, item.link.length - 1)
                     .split("->");
-                  console.log(split_link);
                   split_link.forEach((node: any) => {
                     sources.push(node.toUpperCase());
                   });
@@ -1110,7 +1058,6 @@ export class D3VisComponent implements OnInit {
 
           if (sources.length > 0) {
             defaults = false;
-            //console.log(d.source.id.toUpperCase() , d.target.id.toUpperCase(), (sources.includes(d.source.id.toUpperCase()) && sources.includes(d.target.id.toUpperCase())))
             return (
               sources.includes(d.source.id.toUpperCase()) &&
               sources.includes(d.target.id.toUpperCase())
@@ -1119,7 +1066,6 @@ export class D3VisComponent implements OnInit {
             defaults = true;
             return true;
           }
-          //return (d.source === thisNode) || (d.target === thisNode);
         }));
       // Updates the offset of dashes every 50ms:
       var offset = -1;
@@ -1146,6 +1092,7 @@ export class D3VisComponent implements OnInit {
       clearInterval(this.interValId);
     }
   }
+  // This method is used for determine channel checkboxes is checked or not
   setAll(completed: boolean) {
     this.allComplete = completed;
     if (this.task.subtasks == null) {
@@ -1194,23 +1141,13 @@ export class D3VisComponent implements OnInit {
   }
 
   //#endregion
-  //#region Firebase Methods
+  //#region Firebase Methods (To be removed for direct integration)
   public storageUrl: string = "gs://mininet-optical-file-system.appspot.com";
   //################## Firebase ###############################
   firebaseGetNodeFile() {
     let storage = getStorage();
     getDownloadURL(ref(storage, this.storageUrl + "/nodes.txt"))
       .then((url) => {
-        // // This can be downloaded directly:
-        // const xhr = new XMLHttpRequest();
-        // xhr.responseType = 'blob';
-        // xhr.onload = (event) => {
-        //   const blob = xhr.response;
-        // };
-        // xhr.open('GET', url);
-        // xhr.send();
-
-        console.log(url);
         this.nodeFileUrl = url;
         this.linkfileParse();
       })
@@ -1224,18 +1161,6 @@ export class D3VisComponent implements OnInit {
 
     getDownloadURL(ref(storage, this.storageUrl + "/links.txt"))
       .then((url) => {
-        // `url` is the download URL for 'images/stars.jpg'
-
-        // // This can be downloaded directly:
-        // const xhr = new XMLHttpRequest();
-        // xhr.responseType = 'blob';
-        // xhr.onload = (event) => {
-        //   const blob = xhr.response;
-        // };
-        // xhr.open('GET', url);
-        // xhr.send();
-
-        console.log(url);
         this.linkFileUrl = url;
         this.firebaseGetNodeFile();
         this.firebaseStatus = "200 - Success";
@@ -1282,7 +1207,7 @@ export class D3VisComponent implements OnInit {
     });
   }
   //#endregion
-  //#region File Parse Methods
+  //#region File Parse and Data Parse Methods (Some method to be removed)
   public nodeFileString: string = "";
   public linkFileString: string = "";
   public nodeFileLoaded: boolean = false;
@@ -1298,7 +1223,6 @@ export class D3VisComponent implements OnInit {
   //###############################################################
   loadNodeFile(event: any) {
     const file = event.target.files[0];
-    console.log("type", file.type);
     if (file.type == "text/plain") {
       const reader = new FileReader();
       reader.onload = (e: any) => {
@@ -1321,7 +1245,6 @@ export class D3VisComponent implements OnInit {
   }
   loadLinkFile(event: any) {
     const file = event.target.files[0];
-    console.log("type", file.type);
     if (file.type == "text/plain") {
       const reader = new FileReader();
       reader.onload = (e: any) => {
@@ -1383,7 +1306,6 @@ export class D3VisComponent implements OnInit {
         let updateOSNR: any;
         updateOSNR = this.apiService.uploadOSNRData(this.file_upload_data);
         updateOSNR.subscribe((resp: any) => {
-          console.log(resp);
           if (resp.data?.length > 0) {
             this.notifierService.notify("success", "OSNR successfully updated");
           }
@@ -1398,6 +1320,7 @@ export class D3VisComponent implements OnInit {
       alert("Please load OSNR text file");
     }
   }
+  //file parse (To Be Removed)
   nodefileParse() {
     this.nodeArray = [];
     if (this.nodeFileString != "") {
@@ -1421,7 +1344,7 @@ export class D3VisComponent implements OnInit {
       this.networkData.nodes = this.nodeArray;
       this.preNodeProcess = true;
       this.network = new network(this.networkData);
-      console.log(this.networkData);
+
       if (this.isNetworkOnline) {
         this.firebaseUploadDataFile(JSON.stringify(this.network));
       }
@@ -1455,9 +1378,7 @@ export class D3VisComponent implements OnInit {
         });
     }
   }
-
   hostParse(host: string) {
-    //parse host parameter and split by ':'
     let hostData = host.split(":");
     //if hostData is not empty, then add node to networkData
     if (hostData.length > 0) {
@@ -1476,7 +1397,6 @@ export class D3VisComponent implements OnInit {
   }
 
   roadmParse(roadm: string) {
-    //parse roadm parameter and split by ':'
     let roadmData = roadm.split(",");
     //if roadmData is not empty, then add node to networkData
     if (roadmData.length > 0) {
@@ -1499,7 +1419,6 @@ export class D3VisComponent implements OnInit {
   }
 
   ovsbridgeParse(ovsbridge: string) {
-    //parse ovsbridge parameter and split by ':'
     let ovsbridgeData = ovsbridge.split(",");
     //if ovsbridgeData is not empty, then add node to networkData
     if (ovsbridgeData.length > 0) {
@@ -1522,7 +1441,6 @@ export class D3VisComponent implements OnInit {
   }
 
   terminalParse(terminal: string) {
-    //parse terminal parameter and split by ':'
     let terminalData = terminal.split(",");
     //if terminalData is not empty, then add node to networkData
     if (terminalData.length > 0) {
@@ -1559,17 +1477,16 @@ export class D3VisComponent implements OnInit {
     //{"source": "s0", "target_port_disp": "port_1", "source_port_disp": "port_7", "target": "s4"}
     this.nodeArray.push(node);
   }
-
+  //###############################################################
+  //file parse (To Be Removed)
   linkfileParse() {
     this.linksArray = [];
     if (this.linkFileString != "") {
-      console.log("link file parse ", this.linkFileString);
       for (let line of this.linkFileString.split(/[\r\n]+/)) {
         let status: any = line.match(/\((.*?)\)/);
         if (status != null) {
           if (status.length > 0) {
             line.split("<->").forEach((element, i) => {
-              console.log(element, i);
               element = element.replace(status[0], "");
               let sourceName = element.split("-")[0].replace(" ", "");
               let sourcePort = element.split("-")[1].replace(" ", "");
@@ -1686,8 +1603,6 @@ export class D3VisComponent implements OnInit {
       target_port_disp: targetPortName,
       source_port_disp: sourcePortName,
     };
-    //example of how to add a link to the graph
-    //{"source": "s0", "target_port_disp": "port_1", "source_port_disp": "port_7", "target": "s4"}
     this.linksArray.push(link);
   }
   //###############################################################

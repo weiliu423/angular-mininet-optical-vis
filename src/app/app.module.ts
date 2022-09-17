@@ -4,7 +4,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NetworkTopologyComponent } from './network-topology/network-topology.component';
-import { SigmaVisComponent } from './sigma-vis/sigma-vis.component';
 import { D3VisComponent } from './d3-vis/d3-vis.component';
 import { HttpClientModule } from '@angular/common/http';
 import { D3LineChartComponent } from './d3-line-chart/d3-line-chart.component';
@@ -61,7 +60,6 @@ const customNotifierOptions: NotifierOptions = {
   declarations: [
     AppComponent,
     NetworkTopologyComponent,
-    SigmaVisComponent,
     D3VisComponent,
     D3LineChartComponent,
     DialogComponent,

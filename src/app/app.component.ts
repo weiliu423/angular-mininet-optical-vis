@@ -5,6 +5,8 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
+
+//This is the root components
 export class AppComponent {
   title = 'Mininet Optical Visualizer';
 }
